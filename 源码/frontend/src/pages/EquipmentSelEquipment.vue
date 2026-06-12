@@ -19,8 +19,8 @@
         <el-form-item label="状态">
           <el-select v-model="filters.status" clearable placeholder="全部">
             <el-option label="正常" value="正常" />
-            <el-option label="维修" value="维修" />
-            <el-option label="停用" value="停用" />
+            <el-option label="损坏" value="损坏" />
+            <el-option label="维修中" value="维修中" />
           </el-select>
         </el-form-item>
         <el-form-item class="filter-actions">
