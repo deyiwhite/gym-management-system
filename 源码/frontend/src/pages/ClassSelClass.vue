@@ -49,7 +49,7 @@
         <el-pagination
           v-model:current-page="classPage"
           v-model:page-size="classPageSize"
-          :page-sizes="[8, 10, 15]"
+          :page-sizes="[10, 15, 20]"
           :total="classList.length"
           background
           layout="sizes, prev, pager, next"
@@ -234,7 +234,7 @@ const router = useRouter()
 const activeTab = ref('list')
 const classList = ref([])
 const classPage = ref(1)
-const classPageSize = ref(8)
+const classPageSize = ref(10)
 const recordList = ref([])
 const recordsLoading = ref(false)
 const recordsTouched = ref(false)
