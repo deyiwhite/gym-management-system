@@ -15,7 +15,7 @@
     </el-radio-group>
 
     <section v-if="activeTab === 'list'" class="panel">
-      <el-table :data="classList" class="data-table">
+      <el-table :data="pagedClassList" class="data-table">
         <el-table-column prop="classId" label="编号" width="70" />
         <el-table-column label="名称" width="140">
           <template #default="scope">
@@ -43,6 +43,18 @@
       </el-table>
 
       <el-empty v-if="!classList.length" description="暂无课程数据" />
+
+      <div v-if="classList.length" class="table-footer">
+        <span class="table-count">共 {{ classList.length }} 门课程</span>
+        <el-pagination
+          v-model:current-page="classPage"
+          v-model:page-size="classPageSize"
+          :page-sizes="[8, 10, 15]"
+          :total="classList.length"
+          background
+          layout="sizes, prev, pager, next"
+        />
+      </div>
     </section>
 
     <section v-if="activeTab === 'records'" class="panel">
@@ -214,13 +226,15 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
 const activeTab = ref('list')
 const classList = ref([])
+const classPage = ref(1)
+const classPageSize = ref(8)
 const recordList = ref([])
 const recordsLoading = ref(false)
 const recordsTouched = ref(false)
@@ -248,6 +262,11 @@ const analysis = reactive({
 
 const detailVisible = ref(false)
 const detail = reactive({ cur: null, equipList: [], enrolled: 0 })
+
+const pagedClassList = computed(() => {
+  const start = (classPage.value - 1) * classPageSize.value
+  return classList.value.slice(start, start + classPageSize.value)
+})
 
 const levelMap = { 1: '入门', 2: '进阶', 3: '专业' }
 const statusMap = { 0: '已报名', 1: '已完成', 2: '已取消' }
@@ -335,6 +354,7 @@ function handleRatingStatusChange() {
 async function loadClasses() {
   const resp = await api.get('/api/class/selClass')
   classList.value = resp.data?.classList || []
+  classPage.value = 1
 }
 
 async function loadRecords() {
@@ -516,6 +536,19 @@ p,
 
 .data-table {
   width: 100%;
+}
+
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.table-count {
+  color: #667085;
+  font-size: 13px;
 }
 
 .summary-grid {
