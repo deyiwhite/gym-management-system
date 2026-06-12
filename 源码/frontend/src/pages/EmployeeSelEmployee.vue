@@ -20,7 +20,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="职务">
-          <el-input v-model="filters.staff" clearable placeholder="教练 / 前台等" @keyup.enter="search" />
+          <el-select v-model="filters.staff" clearable placeholder="全部">
+            <el-option label="健身教练" value="健身教练" />
+            <el-option label="保洁员" value="保洁员" />
+          </el-select>
         </el-form-item>
         <el-form-item class="filter-actions">
           <el-button type="primary" :loading="loading" @click="search">查询</el-button>
