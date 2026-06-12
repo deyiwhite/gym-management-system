@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gym.mapper.ExperimentMapper">
+
+    <!-- 查询(1): 报名瑜伽课的会员 -->
+    <select id="query1_yogaMembers" resultType="map">
+        SELECT m.member_id, m.member_name
+        FROM member m
+        JOIN class_record cr ON m.member_id = cr.member_id
+        WHERE cr.class_id = 1
+    </select>
+
+    <!-- 查询(2): 报名增肌课的会员 -->
+    <select id="query2_zengjiMembers" resultType="map">
+        SELECT m.member_id, m.member_name
+        FROM member m
+        JOIN class_record cr ON m.member_id = cr.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        WHERE ct.class_name = '增肌'
+    </select>
+
+    <!-- 查询(3): 没报名瑜伽课的会员 -->
+    <select id="query3_notYogaMembers" resultType="map">
+        SELECT m.member_id, m.member_name
+        FROM member m
+        WHERE m.member_id NOT IN (
+            SELECT cr.member_id FROM class_record cr WHERE cr.class_id = 1
+        )
+    </select>
+
+    <!-- 查询(4): 报名全部课程的会员 (除法) -->
+    <select id="query4_allCoursesMember" resultType="map">
+        SELECT m.member_name
+        FROM member m
+        WHERE NOT EXISTS (
+            SELECT ct.class_id FROM class_table ct
+            WHERE NOT EXISTS (
+                SELECT cr.record_id FROM class_record cr
+                WHERE cr.member_id = m.member_id AND cr.class_id = ct.class_id
+            )
+        )
+    </select>
+
+    <!-- 查询(5): 除瑜伽外全及格的会员与平均评分 -->
+    <select id="query5_passExceptYoga" resultType="map">
+        SELECT cr.member_id, ROUND(AVG(cr.rating), 1) AS avg_rating
+        FROM class_record cr
+        WHERE cr.rating IS NOT NULL
+          AND cr.class_id &lt;&gt; 1
+          AND cr.member_id NOT IN (
+              SELECT cr2.member_id FROM class_record cr2
+              WHERE cr2.class_id &lt;&gt; 1 AND cr2.rating IS NOT NULL AND cr2.rating &lt; 5.0
+          )
+        GROUP BY cr.member_id
+        ORDER BY avg_rating DESC
+    </select>
+
+    <!-- 查询(6): 增肌课评分第2名 -->
+    <select id="query6_zengjiSecond" resultType="map">
+        SELECT m.member_name, cr.rating
+        FROM member m
+        JOIN class_record cr ON m.member_id = cr.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        WHERE ct.class_name = '增肌' AND cr.rating IS NOT NULL
+        ORDER BY cr.rating DESC
+        LIMIT 1 OFFSET 1
+    </select>
+
+    <!-- 查询(7): 高级课(class_level=3) >=3门 rating>=8.0 -->
+    <select id="query7_advancedCourses" resultType="map">
+        SELECT m.member_name
+        FROM member m
+        JOIN class_record cr ON m.member_id = cr.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        WHERE ct.class_level = 3 AND cr.rating >= 8.0
+        GROUP BY m.member_id, m.member_name
+        HAVING COUNT(DISTINCT cr.class_id) >= 3
+    </select>
+
+    <!-- 查询(8): 报名门数唯一的会员 -->
+    <select id="query8_uniqueCount" resultType="map">
+        SELECT member_id, COUNT(DISTINCT class_id) AS course_count
+        FROM class_record
+        GROUP BY member_id
+        HAVING COUNT(DISTINCT class_id) IN (
+            SELECT cnt FROM (
+                SELECT COUNT(DISTINCT class_id) AS cnt
+                FROM class_record
+                GROUP BY member_id
+            ) t
+            GROUP BY cnt
+            HAVING COUNT(*) = 1
+        )
+    </select>
+
+    <!-- 查询(9a): LIKE -->
+    <select id="query9a_like" resultType="map">
+        SELECT * FROM member WHERE member_name LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!-- 查询(9b): BETWEEN -->
+    <select id="query9b_between" resultType="map">
+        SELECT * FROM class_record WHERE rating BETWEEN #{low} AND #{high}
+    </select>
+
+    <!-- 查询(9c): IN -->
+    <select id="query9c_in" resultType="map">
+        SELECT DISTINCT m.member_name
+        FROM member m
+        JOIN class_record cr ON m.member_id = cr.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        WHERE ct.class_name IN
+        <foreach collection="names" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+    </select>
+
+    <!-- 查询(9d): IS NULL -->
+    <select id="query9d_isNull" resultType="map">
+        SELECT * FROM class_record WHERE rating IS NULL AND status = 0
+    </select>
+
+    <!-- 查询(9e): DISTINCT -->
+    <select id="query9e_distinct" resultType="map">
+        SELECT DISTINCT ct.class_name
+        FROM class_table ct
+        JOIN class_record cr ON ct.class_id = cr.class_id
+    </select>
+
+    <!-- 查询(9f): ORDER BY -->
+    <select id="query9f_orderBy" resultType="map">
+        SELECT m.member_name, ct.class_name, cr.rating
+        FROM class_record cr
+        JOIN member m ON cr.member_id = m.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        WHERE cr.rating IS NOT NULL
+        ORDER BY cr.rating DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 查询(9g): GROUP BY + HAVING -->
+    <select id="query9g_groupByHaving" resultType="map">
+        SELECT ct.class_name, ROUND(AVG(cr.rating), 1) AS avg_rating
+        FROM class_table ct
+        JOIN class_record cr ON ct.class_id = cr.class_id
+        WHERE cr.rating IS NOT NULL
+        GROUP BY ct.class_id, ct.class_name
+        HAVING AVG(cr.rating) >= #{minAvg}
+    </select>
+
+</mapper>

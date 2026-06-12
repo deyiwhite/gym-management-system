@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gym.mapper.EquipmentMapper">
+
+    <select id="findAll" resultType="equipment">
+        SELECT equipment_id,
+               equipment_name,
+               location     AS equipment_location,
+               status       AS equipment_status,
+               remark       AS equipment_message
+        FROM equipment
+    </select>
+
+    <delete id="deleteByEquipmentId" parameterType="java.lang.Integer">
+        DELETE FROM equipment
+        WHERE equipment_id = #{equipmentId}
+    </delete>
+
+    <insert id="insertEquipment" parameterType="equipment">
+        INSERT INTO equipment (equipment_name, location, status, remark)
+        VALUES (#{equipmentName}, #{equipmentLocation}, #{equipmentStatus}, #{equipmentMessage})
+    </insert>
+
+    <update id="updateEquipmentByEquipmentId" parameterType="equipment">
+        UPDATE equipment
+        SET equipment_name = #{equipmentName},
+            location       = #{equipmentLocation},
+            status         = #{equipmentStatus},
+            remark         = #{equipmentMessage}
+        WHERE equipment_id = #{equipmentId}
+    </update>
+
+    <select id="selectByEquipmentId" parameterType="java.lang.Integer" resultType="equipment">
+        SELECT equipment_id,
+               equipment_name,
+               location     AS equipment_location,
+               status       AS equipment_status,
+               remark       AS equipment_message
+        FROM equipment
+        WHERE equipment_id = #{equipmentId}
+    </select>
+
+    <select id="selectTotalCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM equipment
+    </select>
+
+    <select id="selectByClassId" parameterType="java.lang.Integer" resultType="equipment">
+        SELECT e.equipment_id,
+               e.equipment_name,
+               e.location     AS equipment_location,
+               e.status       AS equipment_status,
+               e.remark       AS equipment_message
+        FROM equipment e
+        JOIN class_equipment ce ON e.equipment_id = ce.equipment_id
+        WHERE ce.class_id = #{classId}
+    </select>
+
+    <select id="searchEquipment" resultType="equipment">
+        SELECT equipment_id,
+               equipment_name,
+               location     AS equipment_location,
+               status       AS equipment_status,
+               remark       AS equipment_message
+        FROM equipment
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    CAST(equipment_id AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+                    OR equipment_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="location != null and location != ''">
+                AND location LIKE CONCAT('%', #{location}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY equipment_id ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,13 @@
+源码/frontend/node_modules/
+源码/frontend/dist/
+源码/frontend/frontend-dev.*.log
+源码/frontend/frontend-dev.pid
+源码/frontend/output/
+
+源码/gym-management-system/target/
+源码/gym-management-system/.idea/
+
+*.zip
+*.log
+.DS_Store
+Thumbs.db

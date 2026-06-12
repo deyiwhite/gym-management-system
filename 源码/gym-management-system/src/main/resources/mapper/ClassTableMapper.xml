@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gym.mapper.ClassTableMapper">
+
+    <select id="findAll" resultType="classTable">
+        SELECT ct.class_id,
+               ct.class_name,
+               ct.class_begin,
+               ct.class_duration AS class_time,
+               e.employee_name   AS coach,
+               ct.class_level    AS classLevel,
+               ct.class_duration AS classDuration,
+               ct.max_capacity   AS maxCapacity,
+               ct.class_description AS classDescription,
+               ct.price
+        FROM class_table ct
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+    </select>
+
+    <delete id="deleteClassByClassId" parameterType="java.lang.Integer">
+        DELETE FROM class_table WHERE class_id = #{classId}
+    </delete>
+
+    <insert id="insertClass" parameterType="classTable">
+        INSERT INTO class_table (class_id, class_name, class_begin, class_duration, class_level, coach_id, max_capacity, class_description, price)
+        VALUES (#{classId}, #{className}, #{classBegin}, #{classDuration}, #{classLevel}, #{coachId}, #{maxCapacity}, #{classDescription}, #{price})
+    </insert>
+
+    <select id="selectByClassId" parameterType="java.lang.Integer" resultType="classTable">
+        SELECT ct.class_id,
+               ct.class_name,
+               ct.class_begin,
+               ct.class_duration AS class_time,
+               e.employee_name   AS coach,
+               ct.class_level    AS classLevel,
+               ct.class_duration AS classDuration,
+               ct.max_capacity   AS maxCapacity,
+               ct.class_description AS classDescription,
+               ct.price
+        FROM class_table ct
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        WHERE ct.class_id = #{classId}
+    </select>
+
+    <delete id="deleteRecordByClassId" parameterType="java.lang.Integer">
+        DELETE FROM class_record WHERE class_id = #{classId}
+    </delete>
+
+    <select id="selectAnalysisSummary" resultType="map">
+        SELECT COUNT(DISTINCT ct.class_id) AS courseTotal,
+               COUNT(cr.record_id) AS registrationTotal,
+               ROUND(COALESCE(AVG(cr.rating), 0), 1) AS averageRating,
+               SUM(CASE WHEN cr.record_id IS NOT NULL AND cr.rating IS NULL THEN 1 ELSE 0 END) AS unratedTotal
+        FROM class_table ct
+        LEFT JOIN class_record cr ON ct.class_id = cr.class_id
+    </select>
+
+    <select id="selectCourseAnalysisRows" resultType="map">
+        SELECT ct.class_id AS classId,
+               ct.class_name AS className,
+               e.employee_name AS coach,
+               COUNT(cr.record_id) AS enrolledCount,
+               ct.max_capacity AS maxCapacity,
+               CASE
+                   WHEN ct.max_capacity IS NULL OR ct.max_capacity = 0 THEN 0
+                   ELSE ROUND(COUNT(cr.record_id) * 100.0 / NULLIF(ct.max_capacity, 0), 1)
+               END AS capacityUsage,
+               ROUND(AVG(cr.rating), 1) AS averageRating,
+               SUM(CASE WHEN cr.record_id IS NOT NULL AND cr.rating IS NULL THEN 1 ELSE 0 END) AS unratedCount
+        FROM class_table ct
+        LEFT JOIN class_record cr ON ct.class_id = cr.class_id
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        GROUP BY ct.class_id, ct.class_name, e.employee_name, ct.max_capacity
+        ORDER BY enrolledCount DESC, capacityUsage DESC, ct.class_id ASC
+    </select>
+
+</mapper>

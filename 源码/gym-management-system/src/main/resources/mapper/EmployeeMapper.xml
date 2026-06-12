@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gym.mapper.EmployeeMapper">
+
+    <select id="findAll" resultType="employee">
+        SELECT employee_id        AS employee_account,
+               employee_name,
+               gender             AS employee_gender,
+               age                AS employee_age,
+               entry_date         AS entry_time,
+               position           AS staff,
+               ''                 AS employee_message
+        FROM employee
+    </select>
+
+    <delete id="deleteByEmployeeAccount" parameterType="java.lang.Integer">
+        DELETE FROM employee
+        WHERE employee_id = #{employeeAccount}
+    </delete>
+
+    <insert id="insertEmployee" parameterType="employee">
+        INSERT INTO employee (employee_name, gender, age, entry_date, position)
+        VALUES (#{employeeName}, #{employeeGender}, #{employeeAge}, #{entryTime}, #{staff})
+    </insert>
+
+    <update id="updateMemberByEmployeeAccount" parameterType="employee">
+        UPDATE employee
+        SET employee_name = #{employeeName},
+            gender        = #{employeeGender},
+            age           = #{employeeAge},
+            position      = #{staff}
+        WHERE employee_id = #{employeeAccount}
+    </update>
+
+    <select id="selectByEmployeeAccount" parameterType="java.lang.Integer" resultType="employee">
+        SELECT employee_id        AS employee_account,
+               employee_name,
+               gender             AS employee_gender,
+               age                AS employee_age,
+               entry_date         AS entry_time,
+               position           AS staff,
+               ''                 AS employee_message
+        FROM employee
+        WHERE employee_id = #{employeeAccount}
+    </select>
+
+    <select id="selectTotalCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM employee
+    </select>
+
+    <select id="searchEmployees" resultType="employee">
+        SELECT employee_id        AS employee_account,
+               employee_name,
+               gender             AS employee_gender,
+               age                AS employee_age,
+               entry_date         AS entry_time,
+               position           AS staff,
+               ''                 AS employee_message
+        FROM employee
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    CAST(employee_id AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+                    OR employee_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="gender != null and gender != ''">
+                AND gender = #{gender}
+            </if>
+            <if test="staff != null and staff != ''">
+                AND position LIKE CONCAT('%', #{staff}, '%')
+            </if>
+        </where>
+        ORDER BY employee_id ASC
+    </select>
+
+</mapper>

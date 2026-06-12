@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gym.mapper.ClassRecordMapper">
+
+    <resultMap id="ClassRecordVOMap" type="com.gym.pojo.ClassRecordVO">
+        <id column="record_id" property="recordId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="member_name" property="memberName"/>
+        <result column="class_id" property="classId"/>
+        <result column="class_name" property="className"/>
+        <result column="coach_name" property="coachName"/>
+        <result column="class_begin" property="classBegin"/>
+        <result column="join_time" property="joinTime"/>
+        <result column="status" property="status"/>
+        <result column="total_sessions" property="totalSessions"/>
+        <result column="completed_sessions" property="completedSessions"/>
+        <result column="rating" property="rating"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="ClassRecordVOMap">
+        SELECT cr.record_id, cr.member_id, m.member_name,
+               cr.class_id, ct.class_name, e.employee_name AS coach_name,
+               ct.class_begin, cr.join_time, cr.status,
+               cr.total_sessions, cr.completed_sessions, cr.rating
+        FROM class_record cr
+        JOIN member m ON cr.member_id = m.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+    </select>
+
+    <insert id="insertRecord" parameterType="com.gym.pojo.ClassRecord">
+        INSERT INTO class_record (member_id, class_id)
+        VALUES (#{memberId}, #{classId})
+    </insert>
+
+    <select id="selectByMemberId" parameterType="java.lang.Integer" resultMap="ClassRecordVOMap">
+        SELECT cr.record_id, cr.member_id, m.member_name,
+               cr.class_id, ct.class_name, e.employee_name AS coach_name,
+               ct.class_begin, cr.join_time, cr.status,
+               cr.total_sessions, cr.completed_sessions, cr.rating
+        FROM class_record cr
+        JOIN member m ON cr.member_id = m.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        WHERE cr.member_id = #{memberId}
+    </select>
+
+    <delete id="deleteByRecordId" parameterType="java.lang.Integer">
+        DELETE FROM class_record WHERE record_id = #{recordId}
+    </delete>
+
+    <select id="selectByClassIdAndMemberId" resultType="com.gym.pojo.ClassRecord">
+        SELECT * FROM class_record
+        WHERE class_id = #{classId} AND member_id = #{memberId}
+    </select>
+
+    <select id="countByClassId" parameterType="java.lang.Integer" resultType="int">
+        SELECT count(*) FROM class_record WHERE class_id = #{classId}
+    </select>
+
+    <select id="selectByClassId" parameterType="java.lang.Integer" resultMap="ClassRecordVOMap">
+        SELECT cr.record_id, cr.member_id, m.member_name,
+               cr.class_id, ct.class_name, e.employee_name AS coach_name,
+               ct.class_begin, cr.join_time, cr.status,
+               cr.total_sessions, cr.completed_sessions, cr.rating
+        FROM class_record cr
+        JOIN member m ON cr.member_id = m.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        WHERE cr.class_id = #{classId}
+    </select>
+
+    <select id="searchRecords" resultMap="ClassRecordVOMap">
+        SELECT cr.record_id, cr.member_id, m.member_name,
+               cr.class_id, ct.class_name, e.employee_name AS coach_name,
+               ct.class_begin, cr.join_time, cr.status,
+               cr.total_sessions, cr.completed_sessions, cr.rating
+        FROM class_record cr
+        JOIN member m ON cr.member_id = m.member_id
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        <where>
+            <if test="classId != null">
+                AND cr.class_id = #{classId}
+            </if>
+            <if test="memberKeyword != null and memberKeyword != ''">
+                AND (
+                    CAST(cr.member_id AS CHAR) LIKE CONCAT('%', #{memberKeyword}, '%')
+                    OR m.member_name LIKE CONCAT('%', #{memberKeyword}, '%')
+                )
+            </if>
+            <if test="status != null">
+                AND cr.status = #{status}
+            </if>
+            <if test="ratingStatus != null and ratingStatus == 'unrated'">
+                AND cr.rating IS NULL
+            </if>
+            <if test="ratingStatus == null or ratingStatus != 'unrated'">
+                <if test="lowRating != null">
+                    AND cr.rating &gt;= #{lowRating}
+                </if>
+                <if test="highRating != null">
+                    AND cr.rating &lt;= #{highRating}
+                </if>
+            </if>
+        </where>
+        ORDER BY cr.join_time DESC, cr.record_id DESC
+    </select>
+
+</mapper>
