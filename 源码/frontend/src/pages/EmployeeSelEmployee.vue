@@ -20,7 +20,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="职务">
-          <el-select v-model="filters.staff" clearable placeholder="全部">
+          <el-select v-model="filters.staff" clearable placeholder="全部" class="staff-select">
             <el-option label="健身教练" value="健身教练" />
             <el-option label="保洁员" value="保洁员" />
           </el-select>
@@ -153,7 +153,9 @@ p {
 
 .filter-form {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 140px minmax(180px, 1fr) auto;
+  grid-template-columns: minmax(260px, 360px) 160px 180px auto;
+  justify-content: start;
+  align-items: end;
 }
 
 .filter-form :deep(.el-form-item) {
@@ -162,6 +164,16 @@ p {
 
 .filter-form :deep(.el-select) {
   width: 100%;
+}
+
+.filter-actions {
+  min-width: 168px;
+}
+
+@media (max-width: 1100px) {
+  .filter-form {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
 }
 
 .data-table {
