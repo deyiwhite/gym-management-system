@@ -1,11 +1,11 @@
 <template>
-  <div style="padding: 24px">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-      <h2 style="margin: 0">添加会员</h2>
+  <section class="form-page">
+    <div class="form-page-header">
+      <h2>添加会员</h2>
       <el-button @click="router.push('/member/selMember')">返回</el-button>
     </div>
 
-    <el-card style="max-width: 860px">
+    <el-card class="form-card" shadow="never">
       <el-form label-width="140px">
         <el-form-item label="姓名">
           <el-input v-model="form.memberName" />
@@ -34,12 +34,13 @@
         </el-form-item>
       </el-form>
     </el-card>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { postForm } from '../api/client'
 
 const router = useRouter()
@@ -57,13 +58,13 @@ const form = reactive({
 
 async function submit() {
   msg.value = ''
-  if (!form.memberName) return alert('请输入姓名！')
-  if (!form.memberGender) return alert('请输入性别！')
-  if (!form.memberAge) return alert('请输入年龄！')
-  if (!form.memberPhone) return alert('请输入联系方式！')
-  if (!form.memberHeight) return alert('请输入身高！')
-  if (!form.memberWeight) return alert('请输入体重！')
-  if (!form.cardClass) return alert('请输入购买课时！')
+  if (!form.memberName) { ElMessage.error('请输入姓名！'); return }
+  if (!form.memberGender) { ElMessage.error('请输入性别！'); return }
+  if (!form.memberAge) { ElMessage.error('请输入年龄！'); return }
+  if (!form.memberPhone) { ElMessage.error('请输入联系方式！'); return }
+  if (!form.memberHeight) { ElMessage.error('请输入身高！'); return }
+  if (!form.memberWeight) { ElMessage.error('请输入体重！'); return }
+  if (!form.cardClass) { ElMessage.error('请输入购买课时！'); return }
 
   await postForm('/api/member/addMember', {
     memberName: form.memberName,
@@ -79,3 +80,15 @@ async function submit() {
 }
 </script>
 
+<style scoped>
+.form-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+h2 {
+  margin: 0;
+}
+</style>

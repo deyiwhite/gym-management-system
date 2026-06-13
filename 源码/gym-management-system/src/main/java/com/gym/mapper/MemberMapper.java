@@ -32,6 +32,13 @@ public interface MemberMapper {
     List<Member> searchMembers(@Param("keyword") String keyword,
                                @Param("gender") String gender,
                                @Param("minRemain") Integer minRemain,
-                               @Param("maxRemain") Integer maxRemain);
+                               @Param("maxRemain") Integer maxRemain,
+                               @Param("offset") int offset,
+                               @Param("pageSize") int pageSize);
+
+    int countSearchMembers(@Param("keyword") String keyword,
+                           @Param("gender") String gender,
+                           @Param("minRemain") Integer minRemain,
+                           @Param("maxRemain") Integer maxRemain);
 
 }

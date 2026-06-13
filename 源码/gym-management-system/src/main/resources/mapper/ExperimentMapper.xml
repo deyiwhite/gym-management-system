@@ -150,4 +150,57 @@
         HAVING AVG(cr.rating) >= #{minAvg}
     </select>
 
+    <!-- 实验三(1): 课程结课 — 将该课程所有"已报名"批量更新为"已完成" -->
+    <update id="finishCourse" parameterType="int">
+        UPDATE class_record SET status = 1 WHERE class_id = #{classId} AND status = 0
+    </update>
+
+    <!-- 实验三(2): 课程取消 — 删除该课程全部报名记录 -->
+    <delete id="cancelCourse" parameterType="int">
+        DELETE FROM class_record WHERE class_id = #{classId}
+    </delete>
+
+    <!-- 实验三(3): 会员注销 — 删除该会员全部报名记录 -->
+    <delete id="cancelMember" parameterType="int">
+        DELETE FROM class_record WHERE member_id = #{memberId}
+    </delete>
+
+    <!-- 实验四: 视图查询 -->
+    <select id="queryViewAll" resultType="map">
+        SELECT * FROM v_member_course_rating
+    </select>
+
+    <select id="queryViewHighRating" resultType="map">
+        SELECT * FROM v_member_course_rating WHERE rating >= 8.0
+    </select>
+
+    <select id="queryViewMemberAvg" resultType="map">
+        SELECT member_id, member_name,
+               COUNT(*) AS course_count,
+               ROUND(AVG(rating), 1) AS avg_rating
+        FROM v_member_course_rating
+        GROUP BY member_id, member_name
+        HAVING AVG(rating) > 8.0
+    </select>
+
+    <!-- 实验五: 每会员报名统计 -->
+    <select id="queryMemberStats" resultType="map">
+        SELECT m.member_id, m.member_name,
+               COUNT(cr.record_id) AS course_count,
+               ROUND(COALESCE(AVG(cr.rating), 0), 1) AS avg_rating
+        FROM member m
+        LEFT JOIN class_record cr ON m.member_id = cr.member_id
+        GROUP BY m.member_id, m.member_name
+        ORDER BY course_count DESC
+    </select>
+
+    <!-- 实验五: GRANT/REVOKE 授权演示 -->
+    <update id="grantDemo">
+        GRANT SELECT ON gym_db.* TO 'demo_user'@'localhost'
+    </update>
+
+    <update id="revokeDemo">
+        REVOKE SELECT ON gym_db.* FROM 'demo_user'@'localhost'
+    </update>
+
 </mapper>

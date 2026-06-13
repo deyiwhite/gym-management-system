@@ -50,7 +50,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> searchMembers(String keyword, String gender, Integer minRemain, Integer maxRemain) {
-        return memberMapper.searchMembers(keyword, gender, minRemain, maxRemain);
+    public List<Member> searchMembers(String keyword, String gender, Integer minRemain, Integer maxRemain, int page, int pageSize) {
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 10;
+        int offset = (page - 1) * pageSize;
+        return memberMapper.searchMembers(keyword, gender, minRemain, maxRemain, offset, pageSize);
+    }
+
+    @Override
+    public int countSearchMembers(String keyword, String gender, Integer minRemain, Integer maxRemain) {
+        return memberMapper.countSearchMembers(keyword, gender, minRemain, maxRemain);
     }
 }

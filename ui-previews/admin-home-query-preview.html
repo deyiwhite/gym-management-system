@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>管理员主页风格预览</title>
+  <style>
+    :root {
+      --bg: #eef3f8;
+      --surface: #ffffff;
+      --line: #e3eaf3;
+      --text: #152033;
+      --muted: #718095;
+      --primary: #2f7ef7;
+      --primary-soft: #eaf2ff;
+      --nav-top: #2c3e56;
+      --nav-bottom: #223146;
+      --nav-text: #c8d3e2;
+      --nav-muted: #91a3b7;
+      --shadow: 0 14px 34px rgba(30, 50, 77, 0.08);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(47, 126, 247, 0.08), transparent 320px),
+        var(--bg);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 24px 14px 16px;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(79, 140, 255, 0.22), transparent 34%),
+        linear-gradient(180deg, var(--nav-top), var(--nav-bottom));
+      color: var(--nav-text);
+      box-shadow: 8px 0 24px rgba(31, 45, 64, 0.14);
+    }
+
+    .brand {
+      padding: 0 10px 22px;
+    }
+
+    .brand-title {
+      color: #ffffff;
+      font-size: 21px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .brand-sub {
+      margin-top: 8px;
+      color: var(--nav-muted);
+      font-size: 12px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      height: 42px;
+      padding: 0 13px;
+      border-radius: 9px;
+      color: var(--nav-text);
+      font-size: 15px;
+    }
+
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      box-shadow: inset 3px 0 0 #62a4ff;
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.07);
+      color: #ffffff;
+      font-size: 13px;
+    }
+
+    .sidebar-footer span {
+      display: block;
+      margin-top: 5px;
+      color: var(--nav-muted);
+    }
+
+    .main {
+      padding: 28px 34px 36px;
+      overflow: auto;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .page-sub {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .logout {
+      height: 36px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #52647b;
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+      margin-bottom: 64px;
+    }
+
+    .stat-card {
+      min-height: 158px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      background: var(--tone);
+      color: var(--accent);
+    }
+
+    .glyph {
+      position: relative;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+    }
+
+    .glyph.user::before,
+    .glyph.user::after {
+      position: absolute;
+      left: 50%;
+      content: "";
+      transform: translateX(-50%);
+    }
+
+    .glyph.user::before {
+      top: 1px;
+      width: 8px;
+      height: 8px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .glyph.user::after {
+      bottom: 1px;
+      width: 17px;
+      height: 8px;
+      border: 2px solid currentColor;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      border-bottom: 0;
+    }
+
+    .glyph.grid::before {
+      position: absolute;
+      inset: 2px;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+      content: "";
+    }
+
+    .glyph.grid::after {
+      position: absolute;
+      left: 5px;
+      top: 5px;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      content: "";
+    }
+
+    .stat-number {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      color: #0d1b2f;
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-number span {
+      color: #8795a8;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .stat-label {
+      margin-top: 7px;
+      color: #53657d;
+      font-size: 14px;
+    }
+
+    .quick-section {
+      padding: 20px 20px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 132px);
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .quick-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 78px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      color: #4d5f76;
+      font-size: 12px;
+    }
+
+    .quick-card .glyph {
+      color: var(--accent);
+    }
+
+    @media (max-width: 1080px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .quick-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-title">健身房管理系统</div>
+        <div class="brand-sub">Gym Operations Console</div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-item active">管理员主页</div>
+        <div class="nav-item">会员卡查询</div>
+        <div class="nav-item">会员管理</div>
+        <div class="nav-item">员工管理</div>
+        <div class="nav-item">器材管理</div>
+        <div class="nav-item">课程管理</div>
+      </nav>
+
+      <div class="sidebar-footer">
+        管理员
+        <span>今日运营数据已更新</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>管理员主页</h1>
+          <p class="page-sub">欢迎回来，以下是健身房今日概览</p>
+        </div>
+        <button class="logout">退出登录</button>
+      </div>
+
+      <section class="stats">
+        <div class="stat-card" style="--accent:#2f7ef7;--tone:#eaf2ff;">
+          <div class="stat-icon"><span class="glyph user"></span></div>
+          <div class="stat-number">60 <span>人</span></div>
+          <div class="stat-label">健身房总人数</div>
+        </div>
+        <div class="stat-card" style="--accent:#17b981;--tone:#e9fbf4;">
+          <div class="stat-icon"><span class="glyph user"></span></div>
+          <div class="stat-number">9 <span>人</span></div>
+          <div class="stat-label">员工人数</div>
+        </div>
+        <div class="stat-card" style="--accent:#f3a21a;--tone:#fff6df;">
+          <div class="stat-icon"><span class="glyph user"></span></div>
+          <div class="stat-number">51 <span>人</span></div>
+          <div class="stat-label">会员人数</div>
+        </div>
+        <div class="stat-card" style="--accent:#8067e8;--tone:#f1efff;">
+          <div class="stat-icon"><span class="glyph grid"></span></div>
+          <div class="stat-number">23 <span>件</span></div>
+          <div class="stat-label">器材数量</div>
+        </div>
+      </section>
+
+      <section class="quick-section">
+        <h2 class="section-title">快捷入口</h2>
+        <div class="quick-grid">
+          <div class="quick-card" style="--accent:#2f7ef7;"><span class="glyph user"></span>会员管理</div>
+          <div class="quick-card" style="--accent:#17b981;"><span class="glyph user"></span>员工管理</div>
+          <div class="quick-card" style="--accent:#f3a21a;"><span class="glyph grid"></span>课程管理</div>
+          <div class="quick-card" style="--accent:#8067e8;"><span class="glyph grid"></span>器材管理</div>
+          <div class="quick-card" style="--accent:#ef5b5b;"><span class="glyph grid"></span>会员卡查询</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

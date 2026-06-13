@@ -2,6 +2,7 @@ package com.gym.mapper;
 
 import com.gym.pojo.ClassTable;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,9 @@ public interface ClassTableMapper {
 
     Map<String, Object> selectAnalysisSummary();
 
-    List<Map<String, Object>> selectCourseAnalysisRows();
+    List<Map<String, Object>> selectCourseAnalysisRows(@Param("offset") int offset,
+                                                       @Param("pageSize") int pageSize);
+
+    int countCourseAnalysisRows();
 
 }

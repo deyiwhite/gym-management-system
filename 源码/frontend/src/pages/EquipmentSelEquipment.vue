@@ -60,6 +60,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
@@ -105,7 +106,7 @@ function edit(equipmentId) {
 }
 
 async function del(equipmentId) {
-  if (!confirm('确定要删除吗？')) return
+  try { await ElMessageBox.confirm('确定要删除该器材吗？', '删除确认', { type: 'warning' }) } catch { return }
   await postForm('/api/equipment/delEquipment', { equipmentId })
   await search()
 }
@@ -131,20 +132,23 @@ p {
 }
 
 h2 {
-  font-size: 28px;
-  font-weight: 600;
+  color: #0d1b2f;
+  font-size: 26px;
+  font-weight: 800;
 }
 
 p {
-  margin-top: 4px;
-  color: #667085;
+  margin-top: 6px;
+  color: #718095;
   font-size: 14px;
 }
 
 .filter-card {
-  margin-bottom: 16px;
-  border-radius: 6px;
-  background: #f8fafc;
+  margin-bottom: 18px;
+  border: 1px solid #e3eaf3;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
 }
 
 .filter-form {
@@ -172,6 +176,6 @@ p {
 }
 
 .table-footer span {
-  color: #667085;
+  color: #718095;
 }
 </style>

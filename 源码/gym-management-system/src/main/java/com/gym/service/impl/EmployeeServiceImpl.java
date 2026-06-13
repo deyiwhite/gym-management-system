@@ -45,7 +45,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> searchEmployees(String keyword, String gender, String staff) {
-        return employeeMapper.searchEmployees(keyword, gender, staff);
+    public List<Employee> searchEmployees(String keyword, String gender, String staff, int page, int pageSize) {
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 10;
+        int offset = (page - 1) * pageSize;
+        return employeeMapper.searchEmployees(keyword, gender, staff, offset, pageSize);
+    }
+
+    @Override
+    public int countSearchEmployees(String keyword, String gender, String staff) {
+        return employeeMapper.countSearchEmployees(keyword, gender, staff);
     }
 }

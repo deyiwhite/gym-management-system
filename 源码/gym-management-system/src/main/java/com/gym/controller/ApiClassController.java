@@ -8,9 +8,11 @@ import com.gym.service.ClassTableService;
 import com.gym.service.EquipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -59,11 +61,13 @@ public class ApiClassController {
     }
 
     @GetMapping("/analysis")
-    public Map<String, Object> analysis() {
+    public Map<String, Object> analysis(@RequestParam(defaultValue = "1") int page,
+                                        @RequestParam(defaultValue = "10") int pageSize) {
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
         resp.put("summary", classTableService.selectAnalysisSummary());
-        resp.put("courseAnalysisRows", classTableService.selectCourseAnalysisRows());
+        resp.put("courseAnalysisRows", classTableService.selectCourseAnalysisRows(page, pageSize));
+        resp.put("total", classTableService.countCourseAnalysisRows());
         return resp;
     }
 
@@ -96,6 +100,7 @@ public class ApiClassController {
         return resp;
     }
 
+    @Transactional
     @PostMapping("/delClass")
     public ResponseEntity<Map<String, Object>> deleteClass(Integer classId) {
         classTableService.deleteClassByClassId(classId);

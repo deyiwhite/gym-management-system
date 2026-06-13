@@ -15,4 +15,6 @@ public class ClassTable {
     private Integer maxCapacity;
     private String classDescription;
     private Double price;
+    private Integer enrolledCount;
+    private Double capacityUsage;
 }

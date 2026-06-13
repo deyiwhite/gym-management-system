@@ -1,11 +1,11 @@
 <template>
-  <div style="padding: 24px">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-      <h2 style="margin: 0">添加课程</h2>
+  <section class="form-page">
+    <div class="form-page-header">
+      <h2>添加课程</h2>
       <el-button @click="router.push('/class/selClass')">返回</el-button>
     </div>
 
-    <el-card style="max-width: 720px">
+    <el-card class="form-card class-form-card" shadow="never">
       <el-form label-width="120px">
         <el-form-item label="编号">
           <el-input v-model="form.classId" placeholder="4位编号" />
@@ -46,12 +46,13 @@
         </el-form-item>
       </el-form>
     </el-card>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { postForm } from '../api/client'
 import api from '../api/client'
 
@@ -76,11 +77,28 @@ onMounted(async () => {
 })
 
 async function submit() {
-  if (!form.classId) return alert('请输入课程编号！')
-  if (!form.className) return alert('请输入课程名称！')
-  if (!form.classBegin) return alert('请输入课程时间！')
+  if (!form.classId) { ElMessage.error('请输入课程编号！'); return }
+  if (!form.className) { ElMessage.error('请输入课程名称！'); return }
+  if (!form.classBegin) { ElMessage.error('请输入课程时间！'); return }
 
   await postForm('/api/class/addClass', { ...form, classId: Number(form.classId) })
   router.push('/class/selClass')
 }
 </script>
+
+<style scoped>
+.form-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.class-form-card {
+  max-width: 720px;
+}
+
+h2 {
+  margin: 0;
+}
+</style>

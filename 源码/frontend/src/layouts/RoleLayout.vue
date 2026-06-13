@@ -7,9 +7,9 @@
         :router="true"
         :default-active="activePath"
         class="role-menu"
-        background-color="#304156"
-        text-color="#bfc5d1"
-        active-text-color="#ffd04b"
+        background-color="transparent"
+        text-color="#c8d3e2"
+        active-text-color="#ffffff"
       >
         <template v-if="role === 'admin'">
           <el-menu-item index="/toAdminMain">管理员主页</el-menu-item>
@@ -33,8 +33,8 @@
       </el-menu>
 
       <div class="role-footer">
-        <div class="role-footer-title">你好！</div>
-        <div class="role-footer-text">{{ role === 'admin' ? '管理员' : '尊敬的会员' }}</div>
+        <div class="role-footer-title">{{ role === 'admin' ? '管理员' : '会员' }}</div>
+        <div class="role-footer-text">{{ role === 'admin' ? '今日运营数据已更新' : '欢迎回来' }}</div>
       </div>
     </el-aside>
 
@@ -63,22 +63,28 @@ const activePath = computed(() => route.path)
   min-height: 100svh;
   width: 100%;
   min-width: 0;
+  align-items: flex-start;
   background: #f4f6f9;
 }
 
 .role-aside {
-  background: #304156;
-  color: #bfc5d1;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   flex: 0 0 240px;
-  box-shadow: 2px 0 10px rgba(15, 23, 42, 0.08);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(79, 140, 255, 0.22), transparent 34%),
+    linear-gradient(180deg, #2c3e56, #223146);
+  color: #c8d3e2;
+  box-shadow: 8px 0 24px rgba(31, 45, 64, 0.14);
 }
 
 .role-title {
-  padding: 24px 20px 22px;
-  font-size: 22px;
-  font-weight: 700;
+  padding: 24px 20px 26px;
+  font-size: 21px;
+  font-weight: 800;
   line-height: 1.25;
   color: #ffffff;
 }
@@ -86,40 +92,62 @@ const activePath = computed(() => route.path)
 .role-menu {
   border-right: none;
   flex: 1;
-  padding: 0;
+  padding: 0 12px;
+  background: transparent;
 }
 
 .role-menu .el-menu-item {
-  height: 52px;
-  padding-left: 20px !important;
-  font-size: 16px;
+  height: 42px;
+  margin-bottom: 6px;
+  padding-left: 13px !important;
+  border-radius: 9px;
+  font-size: 15px;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 .role-menu .el-sub-menu .el-sub-menu__title {
-  height: 52px;
-  padding-left: 20px !important;
-  font-size: 16px;
+  height: 42px;
+  padding-left: 13px !important;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+.role-menu :deep(.el-menu-item:hover),
+.role-menu :deep(.el-sub-menu__title:hover) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.role-menu :deep(.el-menu-item.is-active) {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 3px 0 0 #62a4ff;
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .role-footer {
-  padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: auto 14px 16px;
+  padding: 14px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
 }
 
 .role-footer-title {
-  font-size: 12px;
-  opacity: 0.9;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .role-footer-text {
-  margin-top: 4px;
-  font-size: 14px;
-  color: #ffffff;
+  margin-top: 6px;
+  color: #9fb0c5;
+  font-size: 13px;
 }
 
 .role-main {
   min-width: 0;
   padding: 24px 32px;
   overflow: auto;
-  background: #ffffff;
+  background: #eef3f8;
 }
 </style>

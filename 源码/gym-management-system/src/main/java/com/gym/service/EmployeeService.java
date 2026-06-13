@@ -24,6 +24,8 @@ public interface EmployeeService {
     //查询员工数
     Integer selectTotalCount();
 
-    List<Employee> searchEmployees(String keyword, String gender, String staff);
+    List<Employee> searchEmployees(String keyword, String gender, String staff, int page, int pageSize);
+
+    int countSearchEmployees(String keyword, String gender, String staff);
 
 }

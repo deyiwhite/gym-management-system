@@ -14,9 +14,18 @@
                ct.class_duration AS classDuration,
                ct.max_capacity   AS maxCapacity,
                ct.class_description AS classDescription,
-               ct.price
+               ct.price,
+               COUNT(cr.record_id) AS enrolledCount,
+               CASE
+                   WHEN ct.max_capacity IS NULL OR ct.max_capacity = 0 THEN 0
+                   ELSE ROUND(COUNT(cr.record_id) * 100.0 / NULLIF(ct.max_capacity, 0), 1)
+               END AS capacityUsage
         FROM class_table ct
         LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        LEFT JOIN class_record cr ON ct.class_id = cr.class_id
+        GROUP BY ct.class_id, ct.class_name, ct.class_begin, ct.class_duration,
+                 e.employee_name, ct.class_level, ct.max_capacity, ct.class_description, ct.price
+        ORDER BY ct.class_begin ASC, ct.class_id ASC
     </select>
 
     <delete id="deleteClassByClassId" parameterType="java.lang.Integer">
@@ -74,6 +83,11 @@
         LEFT JOIN employee e ON ct.coach_id = e.employee_id
         GROUP BY ct.class_id, ct.class_name, e.employee_name, ct.max_capacity
         ORDER BY enrolledCount DESC, capacityUsage DESC, ct.class_id ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countCourseAnalysisRows" resultType="int">
+        SELECT COUNT(*) FROM class_table
     </select>
 
 </mapper>

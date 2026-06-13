@@ -278,6 +278,123 @@ code {
   }
 }
 
+.page,
+.class-page,
+.form-page {
+  min-width: 0;
+}
+
+.page-header,
+.form-page-header,
+.class-page .page-header {
+  margin-bottom: 22px;
+}
+
+.page-header h2,
+.form-page-header h2,
+.class-page .page-header h2 {
+  color: #0d1b2f;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.page-header p,
+.class-page .page-header p {
+  margin-top: 6px;
+  color: #718095;
+  font-size: 14px;
+}
+
+.filter-card.el-card,
+.form-card.el-card,
+.record-filter-card.el-card,
+.analysis-card.el-card,
+.insight-card.el-card {
+  border: 1px solid #e3eaf3;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
+}
+
+.filter-card.el-card {
+  margin-bottom: 18px;
+}
+
+.form-card.el-card {
+  max-width: 860px;
+}
+
+.filter-card .el-card__body,
+.form-card .el-card__body,
+.record-filter-card .el-card__body {
+  padding: 18px;
+}
+
+.el-form-item__label {
+  color: #53657d;
+  font-weight: 700;
+}
+
+.el-input__wrapper,
+.el-select__wrapper,
+.el-input-number .el-input__wrapper {
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #d8e2ee inset;
+}
+
+.el-input__wrapper:hover,
+.el-select__wrapper:hover,
+.el-input-number .el-input__wrapper:hover {
+  box-shadow: 0 0 0 1px #b9c8dc inset;
+}
+
+.el-button {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.el-button--primary {
+  background: #2f7ef7;
+  border-color: #2f7ef7;
+  box-shadow: 0 8px 18px rgba(47, 126, 247, 0.18);
+}
+
+.data-table.el-table {
+  overflow: hidden;
+  border: 1px solid #e3eaf3;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
+}
+
+.data-table.el-table th.el-table__cell {
+  background: #f8fbff;
+  color: #66778e;
+  font-weight: 800;
+}
+
+.data-table.el-table td.el-table__cell {
+  color: #334155;
+}
+
+.table-footer {
+  padding: 12px 2px 0;
+}
+
+.table-count,
+.table-footer span {
+  color: #718095;
+}
+
+.el-pagination.is-background .el-pager li.is-active {
+  background-color: #2f7ef7;
+}
+
+.el-tag {
+  border-radius: 999px;
+  font-weight: 700;
+}
+
 .ticks {
   position: relative;
   width: 100%;

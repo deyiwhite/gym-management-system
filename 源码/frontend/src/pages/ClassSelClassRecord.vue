@@ -63,6 +63,7 @@
       </el-table>
       <el-empty v-else-if="activeInsight.ran" :description="`${activeInsight.title}暂无结果`" />
     </el-card>
+
   </section>
 </template>
 
@@ -139,7 +140,7 @@ async function runRecordInsight(type) {
     },
     strengthSecond: {
       title: '增肌课第二名',
-      url: '/api/experiment/q6',
+      url: '/api/experiment/query6',
       params: {},
       columns: [
         { prop: 'member_name', label: '会员姓名' },
@@ -148,7 +149,7 @@ async function runRecordInsight(type) {
     },
     passExceptYoga: {
       title: '除瑜伽外评分达标会员',
-      url: '/api/experiment/q5',
+      url: '/api/experiment/query5',
       params: {},
       columns: [
         { prop: 'member_id', label: '会员ID' },
@@ -186,19 +187,21 @@ p {
 }
 
 h2 {
-  font-size: 28px;
-  font-weight: 600;
+  color: #0d1b2f;
+  font-size: 26px;
+  font-weight: 800;
 }
 
 h3 {
+  color: #0d1b2f;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 p,
 .muted {
-  margin-top: 4px;
-  color: #667085;
+  margin-top: 6px;
+  color: #718095;
   font-size: 14px;
 }
 
@@ -208,7 +211,9 @@ p,
 
 .insight-card {
   margin-top: 24px;
-  border-radius: 6px;
+  border: 1px solid #e3eaf3;
+  border-radius: 14px;
+  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
 }
 
 .filters {
@@ -227,4 +232,5 @@ p,
   width: 100%;
   margin-top: 16px;
 }
+
 </style>

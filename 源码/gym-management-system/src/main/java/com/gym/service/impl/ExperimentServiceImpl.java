@@ -29,4 +29,13 @@ public class ExperimentServiceImpl implements ExperimentService {
     @Override public List<Map<String, Object>> query9e_distinct() { return experimentMapper.query9e_distinct(); }
     @Override public List<Map<String, Object>> query9f_orderBy(int limit) { return experimentMapper.query9f_orderBy(limit); }
     @Override public List<Map<String, Object>> query9g_groupByHaving(Double minAvg) { return experimentMapper.query9g_groupByHaving(minAvg); }
+    @Override public int finishCourse(int classId) { return experimentMapper.finishCourse(classId); }
+    @Override public int cancelCourse(int classId) { return experimentMapper.cancelCourse(classId); }
+    @Override public int cancelMember(int memberId) { return experimentMapper.cancelMember(memberId); }
+    @Override public List<Map<String, Object>> queryViewAll() { return experimentMapper.queryViewAll(); }
+    @Override public List<Map<String, Object>> queryViewHighRating() { return experimentMapper.queryViewHighRating(); }
+    @Override public List<Map<String, Object>> queryViewMemberAvg() { return experimentMapper.queryViewMemberAvg(); }
+    @Override public List<Map<String, Object>> queryMemberStats() { return experimentMapper.queryMemberStats(); }
+    @Override public void grantDemo() { experimentMapper.grantDemo(); }
+    @Override public void revokeDemo() { experimentMapper.revokeDemo(); }
 }

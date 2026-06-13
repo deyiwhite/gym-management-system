@@ -96,7 +96,7 @@ onMounted(() => {
 .admin-main {
   min-height: 100%;
   padding: 28px 32px;
-  background: #f4f6f9;
+  background: #eef3f8;
 }
 
 .page-header {
@@ -146,17 +146,18 @@ onMounted(() => {
 }
 
 .stat-card {
-  min-height: 158px;
-  padding: 20px 20px 16px;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
+  min-height: 152px;
+  padding: 20px;
+  border: 1px solid #e3eaf3;
+  border-radius: 14px;
   background: #ffffff;
+  box-shadow: 0 14px 34px rgba(30, 50, 77, 0.08);
   cursor: default;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .stat-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 36px rgba(30, 50, 77, 0.11);
   transform: translateY(-2px);
 }
 
@@ -175,25 +176,25 @@ onMounted(() => {
 .stat-body {
   display: flex;
   align-items: baseline;
-  gap: 4px;
-  margin-bottom: 4px;
+  gap: 5px;
+  margin-bottom: 7px;
 }
 
 .stat-value {
-  color: #111827;
-  font-size: 32px;
-  font-weight: 700;
+  color: #0d1b2f;
+  font-size: 34px;
+  font-weight: 800;
   line-height: 1;
 }
 
 .stat-unit {
-  color: #9ca3af;
+  color: #8795a8;
   font-size: 14px;
 }
 
 .stat-label {
-  color: #6b7280;
-  font-size: 13px;
+  color: #53657d;
+  font-size: 14px;
 }
 
 .quick-section {

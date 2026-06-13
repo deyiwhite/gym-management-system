@@ -149,4 +149,104 @@ public class ExperimentController {
         resp.put("title", "查询(9g): GROUP BY+HAVING 平均评分>=" + minAvg + "的课程");
         return resp;
     }
+
+    // ========== 实验三: 数据修改 ==========
+
+    @PostMapping("/finishCourse")
+    public Map<String, Object> finishCourse(@RequestParam int classId) {
+        int rows = experimentService.finishCourse(classId);
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("affectedRows", rows);
+        resp.put("title", "课程结课: 课程" + classId + " 共" + rows + "条报名记录已标记为完成");
+        return resp;
+    }
+
+    @PostMapping("/cancelCourse")
+    public Map<String, Object> cancelCourse(@RequestParam int classId) {
+        int rows = experimentService.cancelCourse(classId);
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("affectedRows", rows);
+        resp.put("title", "课程取消: 课程" + classId + " 共" + rows + "条报名记录已删除");
+        return resp;
+    }
+
+    @PostMapping("/cancelMember")
+    public Map<String, Object> cancelMember(@RequestParam int memberId) {
+        int rows = experimentService.cancelMember(memberId);
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("affectedRows", rows);
+        resp.put("title", "会员注销: 会员" + memberId + " 共" + rows + "条报名记录已删除");
+        return resp;
+    }
+
+    // ========== 实验四: 视图操作 ==========
+
+    @GetMapping("/queryViewAll")
+    public Map<String, Object> queryViewAll() {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("data", experimentService.queryViewAll());
+        resp.put("title", "视图查询: 全部会员选课评分");
+        return resp;
+    }
+
+    @GetMapping("/queryViewHighRating")
+    public Map<String, Object> queryViewHighRating() {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("data", experimentService.queryViewHighRating());
+        resp.put("title", "视图查询: 评分>=8.0的选课记录");
+        return resp;
+    }
+
+    @GetMapping("/queryViewMemberAvg")
+    public Map<String, Object> queryViewMemberAvg() {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("data", experimentService.queryViewMemberAvg());
+        resp.put("title", "视图查询: 平均分>8.0的会员");
+        return resp;
+    }
+
+    // ========== 实验五: 库函数 + 授权 ==========
+
+    @GetMapping("/queryMemberStats")
+    public Map<String, Object> queryMemberStats() {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("data", experimentService.queryMemberStats());
+        resp.put("title", "统计: 每会员报名门数与平均评分");
+        return resp;
+    }
+
+    @PostMapping("/grantDemo")
+    public Map<String, Object> grantDemo() {
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            experimentService.grantDemo();
+            resp.put("success", true);
+            resp.put("message", "GRANT 执行成功");
+        } catch (Exception e) {
+            resp.put("success", false);
+            resp.put("message", "GRANT 失败(可能权限不足): " + e.getMessage());
+        }
+        return resp;
+    }
+
+    @PostMapping("/revokeDemo")
+    public Map<String, Object> revokeDemo() {
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            experimentService.revokeDemo();
+            resp.put("success", true);
+            resp.put("message", "REVOKE 执行成功");
+        } catch (Exception e) {
+            resp.put("success", false);
+            resp.put("message", "REVOKE 失败(可能权限不足): " + e.getMessage());
+        }
+        return resp;
+    }
 }

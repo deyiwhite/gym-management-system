@@ -1,11 +1,11 @@
 <template>
-  <div style="padding: 24px">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-      <h2 style="margin: 0">编辑器材</h2>
+  <section class="form-page">
+    <div class="form-page-header">
+      <h2>编辑器材</h2>
       <el-button @click="router.push('/equipment/selEquipment')">返回</el-button>
     </div>
 
-    <el-card style="max-width: 860px" v-if="equipment">
+    <el-card class="form-card" shadow="never" v-if="equipment">
       <el-form label-width="140px">
         <el-form-item label="器材id">
           <el-input v-model="equipment.equipmentId" disabled />
@@ -17,7 +17,11 @@
           <el-input v-model="equipment.equipmentLocation" />
         </el-form-item>
         <el-form-item label="器材状态">
-          <el-input v-model="equipment.equipmentStatus" />
+          <el-select v-model="equipment.equipmentStatus" style="width: 100%">
+            <el-option label="正常" value="正常" />
+            <el-option label="维修中" value="维修中" />
+            <el-option label="已报废" value="已报废" />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input v-model="equipment.equipmentMessage" />
@@ -29,8 +33,8 @@
       </el-form>
     </el-card>
 
-    <el-card v-else>加载中...</el-card>
-  </div>
+    <el-card class="form-card" shadow="never" v-else>加载中...</el-card>
+  </section>
 </template>
 
 <script setup>
@@ -60,3 +64,15 @@ onMounted(() => {
 })
 </script>
 
+<style scoped>
+.form-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+h2 {
+  margin: 0;
+}
+</style>

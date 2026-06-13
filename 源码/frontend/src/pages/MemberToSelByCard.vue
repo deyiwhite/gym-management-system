@@ -1,14 +1,17 @@
 <template>
-  <div style="padding: 24px">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-      <h2 style="margin: 0">会员卡查询</h2>
+  <section class="page">
+    <div class="page-header">
+      <div>
+        <h2>会员卡查询</h2>
+        <p>输入会员卡号或账号，快速查看会员资料和课时状态。</p>
+      </div>
       <el-button @click="router.push('/toAdminMain')">返回主页</el-button>
     </div>
 
-    <el-card style="max-width: 860px; margin-bottom: 16px">
-      <el-form label-width="140px">
+    <el-card class="query-card" shadow="never">
+      <el-form class="query-form" label-position="top">
         <el-form-item label="会员卡号/账号">
-          <el-input v-model="memberAccount" />
+          <el-input v-model="memberAccount" placeholder="请输入会员卡号/账号" @keyup.enter="submit" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submit">查询</el-button>
@@ -16,9 +19,9 @@
       </el-form>
     </el-card>
 
-    <el-card v-if="noMessage" style="max-width: 860px; color: #d00">{{ noMessage }}</el-card>
+    <el-card v-if="noMessage" class="empty-card" shadow="never">{{ noMessage }}</el-card>
 
-    <el-table :data="memberList" style="width: 100%" v-else>
+    <el-table :data="memberList" class="data-table" v-else>
       <el-table-column prop="memberAccount" label="会员账号/卡号" width="160" />
       <el-table-column prop="memberName" label="姓名" />
       <el-table-column prop="cardTime" label="办卡时间" width="140" />
@@ -35,12 +38,13 @@
         </template>
       </el-table-column>
     </el-table>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
@@ -52,7 +56,7 @@ async function submit() {
   noMessage.value = ''
   memberList.value = []
   const account = Number(memberAccount.value || 0)
-  if (!account) return alert('请输入会员卡号！')
+  if (!account) { ElMessage.error('请输入会员卡号！'); return }
 
   const resp = await postForm('/api/member/selByCard', { memberAccount: account })
   const data = resp.data || {}
@@ -72,3 +76,58 @@ onMounted(() => {
 })
 </script>
 
+<style scoped>
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+h2,
+p {
+  margin: 0;
+}
+
+h2 {
+  color: #0d1b2f;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+p {
+  margin-top: 6px;
+  color: #718095;
+  font-size: 14px;
+}
+
+.query-card,
+.empty-card {
+  max-width: 860px;
+  margin-bottom: 18px;
+  border: 1px solid #e3eaf3;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
+}
+
+.query-form {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.query-form :deep(.el-form-item) {
+  margin-bottom: 0;
+}
+
+.empty-card {
+  color: #ef4444;
+}
+
+.data-table {
+  width: 100%;
+}
+</style>

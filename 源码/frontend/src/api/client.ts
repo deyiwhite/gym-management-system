@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const api = axios.create({
-  withCredentials: true
+  withCredentials: true,
+  timeout: 8000
 })
 
 export function postForm(url: string, data: Record<string, any>) {

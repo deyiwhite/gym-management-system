@@ -1,11 +1,11 @@
 <template>
-  <div style="padding: 24px">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-      <h2 style="margin: 0">添加员工</h2>
+  <section class="form-page">
+    <div class="form-page-header">
+      <h2>添加员工</h2>
       <el-button @click="router.push('/employee/selEmployee')">返回</el-button>
     </div>
 
-    <el-card style="max-width: 860px">
+    <el-card class="form-card" shadow="never">
       <el-form label-width="140px">
         <el-form-item label="姓名">
           <el-input v-model="form.employeeName" />
@@ -28,12 +28,13 @@
         </el-form-item>
       </el-form>
     </el-card>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { postForm } from '../api/client'
 
 const router = useRouter()
@@ -48,10 +49,10 @@ const form = reactive({
 
 async function submit() {
   msg.value = ''
-  if (!form.employeeName) return alert('请输入姓名！')
-  if (!form.employeeGender) return alert('请输入性别！')
-  if (!form.employeeAge) return alert('请输入年龄！')
-  if (!form.staff) return alert('请输入职务！')
+  if (!form.employeeName) { ElMessage.error('请输入姓名！'); return }
+  if (!form.employeeGender) { ElMessage.error('请输入性别！'); return }
+  if (!form.employeeAge) { ElMessage.error('请输入年龄！'); return }
+  if (!form.staff) { ElMessage.error('请输入职务！'); return }
 
   await postForm('/api/employee/addEmployee', {
     employeeName: form.employeeName,
@@ -65,3 +66,15 @@ async function submit() {
 }
 </script>
 
+<style scoped>
+.form-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+h2 {
+  margin: 0;
+}
+</style>

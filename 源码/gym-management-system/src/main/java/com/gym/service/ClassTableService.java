@@ -24,6 +24,8 @@ public interface ClassTableService {
 
     Map<String, Object> selectAnalysisSummary();
 
-    List<Map<String, Object>> selectCourseAnalysisRows();
+    List<Map<String, Object>> selectCourseAnalysisRows(int page, int pageSize);
+
+    int countCourseAnalysisRows();
 
 }

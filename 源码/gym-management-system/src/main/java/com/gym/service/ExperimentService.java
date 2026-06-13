@@ -19,4 +19,15 @@ public interface ExperimentService {
     List<Map<String, Object>> query9e_distinct();
     List<Map<String, Object>> query9f_orderBy(int limit);
     List<Map<String, Object>> query9g_groupByHaving(Double minAvg);
+
+    int finishCourse(int classId);
+    int cancelCourse(int classId);
+    int cancelMember(int memberId);
+
+    List<Map<String, Object>> queryViewAll();
+    List<Map<String, Object>> queryViewHighRating();
+    List<Map<String, Object>> queryViewMemberAvg();
+    List<Map<String, Object>> queryMemberStats();
+    void grantDemo();
+    void revokeDemo();
 }

@@ -28,6 +28,8 @@ public interface MemberService {
     //根据会员账号查询会员
     List<Member> selectByMemberAccount(Integer memberAccount);
 
-    List<Member> searchMembers(String keyword, String gender, Integer minRemain, Integer maxRemain);
+    List<Member> searchMembers(String keyword, String gender, Integer minRemain, Integer maxRemain, int page, int pageSize);
+
+    int countSearchMembers(String keyword, String gender, Integer minRemain, Integer maxRemain);
 
 }

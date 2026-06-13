@@ -48,7 +48,15 @@ public class ClassTableServiceImpl implements ClassTableService {
     }
 
     @Override
-    public List<Map<String, Object>> selectCourseAnalysisRows() {
-        return classTableMapper.selectCourseAnalysisRows();
+    public List<Map<String, Object>> selectCourseAnalysisRows(int page, int pageSize) {
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 10;
+        int offset = (page - 1) * pageSize;
+        return classTableMapper.selectCourseAnalysisRows(offset, pageSize);
+    }
+
+    @Override
+    public int countCourseAnalysisRows() {
+        return classTableMapper.countCourseAnalysisRows();
     }
 }

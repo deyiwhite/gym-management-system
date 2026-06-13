@@ -1,11 +1,11 @@
 <template>
-  <div style="padding: 24px">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-      <h2 style="margin: 0">编辑会员</h2>
+  <section class="form-page">
+    <div class="form-page-header">
+      <h2>编辑会员</h2>
       <el-button @click="router.push('/member/selMember')">返回</el-button>
     </div>
 
-    <el-card style="max-width: 860px" v-if="member">
+    <el-card class="form-card" shadow="never" v-if="member">
       <el-form label-width="140px">
         <el-form-item label="会员账号/卡号">
           <el-input v-model="member.memberAccount" disabled />
@@ -44,8 +44,8 @@
       </el-form>
     </el-card>
 
-    <el-card v-else>加载中...</el-card>
-  </div>
+    <el-card class="form-card" shadow="never" v-else>加载中...</el-card>
+  </section>
 </template>
 
 <script setup>
@@ -77,3 +77,15 @@ onMounted(() => {
 })
 </script>
 
+<style scoped>
+.form-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+h2 {
+  margin: 0;
+}
+</style>

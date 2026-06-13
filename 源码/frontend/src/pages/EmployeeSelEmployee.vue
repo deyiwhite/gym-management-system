@@ -32,7 +32,7 @@
       </el-form>
     </el-card>
 
-    <el-table v-loading="loading" :data="pagedList" class="data-table">
+    <el-table v-loading="loading" :data="employeeList" class="data-table">
       <el-table-column prop="employeeAccount" label="工号" width="120" />
       <el-table-column prop="employeeName" label="姓名" />
       <el-table-column prop="employeeGender" label="性别" width="90" />
@@ -49,59 +49,92 @@
     </el-table>
 
     <div class="table-footer">
-      <span>共 {{ employeeList.length }} 条</span>
+      <span>共 {{ total }} 条</span>
       <el-pagination
         v-model:current-page="page"
         v-model:page-size="pageSize"
         :page-sizes="[10, 20, 50]"
         layout="sizes, prev, pager, next"
-        :total="employeeList.length"
+        :total="total"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
       />
     </div>
   </section>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onActivated, onBeforeUnmount, onDeactivated, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
 const employeeList = ref([])
+const total = ref(0)
 const loading = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ keyword: '', gender: '', staff: '' })
+let pageActive = true
+let requestController = null
 
-const pagedList = computed(() => {
-  const start = (page.value - 1) * pageSize.value
-  return employeeList.value.slice(start, start + pageSize.value)
-})
+function isCanceled(error) {
+  return error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
+}
 
 async function load(params = {}) {
+  requestController?.abort()
+  const controller = new AbortController()
+  requestController = controller
   loading.value = true
   try {
-    const resp = await api.get('/api/employee/search', { params })
+    const resp = await api.get('/api/employee/search', { params, signal: controller.signal })
+    if (!pageActive || controller.signal.aborted) return
     employeeList.value = resp.data?.employeeList || []
-    page.value = 1
+    total.value = resp.data?.total || 0
+  } catch (error) {
+    if (!isCanceled(error)) throw error
   } finally {
-    loading.value = false
+    if (requestController === controller) {
+      requestController = null
+      if (pageActive) loading.value = false
+    }
+  }
+}
+
+function buildParams() {
+  return {
+    keyword: filters.keyword || undefined,
+    gender: filters.gender || undefined,
+    staff: filters.staff || undefined,
+    page: page.value,
+    pageSize: pageSize.value
   }
 }
 
 function search() {
-  return load({
-    keyword: filters.keyword || undefined,
-    gender: filters.gender || undefined,
-    staff: filters.staff || undefined
-  })
+  page.value = 1
+  return load(buildParams())
+}
+
+function handlePageChange(p) {
+  page.value = p
+  return load(buildParams())
+}
+
+function handleSizeChange(s) {
+  pageSize.value = s
+  page.value = 1
+  return load(buildParams())
 }
 
 function reset() {
   filters.keyword = ''
   filters.gender = ''
   filters.staff = ''
-  return load()
+  page.value = 1
+  return load(buildParams())
 }
 
 function edit(employeeAccount) {
@@ -109,13 +142,28 @@ function edit(employeeAccount) {
 }
 
 async function del(employeeAccount) {
-  if (!confirm('确定要解雇吗？')) return
+  try { await ElMessageBox.confirm('确定要解雇该员工吗？', '解雇确认', { type: 'warning' }) } catch { return }
   await postForm('/api/employee/delEmployee', { employeeAccount })
   await search()
 }
 
 onMounted(() => {
-  load().catch(() => {})
+  load(buildParams()).catch(() => {})
+})
+
+onActivated(() => {
+  pageActive = true
+})
+
+onDeactivated(() => {
+  pageActive = false
+  loading.value = false
+  requestController?.abort()
+})
+
+onBeforeUnmount(() => {
+  pageActive = false
+  requestController?.abort()
 })
 </script>
 
@@ -135,20 +183,23 @@ p {
 }
 
 h2 {
-  font-size: 28px;
-  font-weight: 600;
+  color: #0d1b2f;
+  font-size: 26px;
+  font-weight: 800;
 }
 
 p {
-  margin-top: 4px;
-  color: #667085;
+  margin-top: 6px;
+  color: #718095;
   font-size: 14px;
 }
 
 .filter-card {
-  margin-bottom: 16px;
-  border-radius: 6px;
-  background: #f8fafc;
+  margin-bottom: 18px;
+  border: 1px solid #e3eaf3;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
 }
 
 .filter-form {
@@ -188,6 +239,6 @@ p {
 }
 
 .table-footer span {
-  color: #667085;
+  color: #718095;
 }
 </style>

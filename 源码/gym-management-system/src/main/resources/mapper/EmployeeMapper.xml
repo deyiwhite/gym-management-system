@@ -74,6 +74,25 @@
             </if>
         </where>
         ORDER BY employee_id ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countSearchEmployees" resultType="int">
+        SELECT COUNT(*) FROM employee
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    CAST(employee_id AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+                    OR employee_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="gender != null and gender != ''">
+                AND gender = #{gender}
+            </if>
+            <if test="staff != null and staff != ''">
+                AND position LIKE CONCAT('%', #{staff}, '%')
+            </if>
+        </where>
     </select>
 
 </mapper>

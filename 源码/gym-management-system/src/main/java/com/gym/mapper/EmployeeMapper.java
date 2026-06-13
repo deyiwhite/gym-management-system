@@ -29,6 +29,12 @@ public interface EmployeeMapper {
 
     List<Employee> searchEmployees(@Param("keyword") String keyword,
                                    @Param("gender") String gender,
-                                   @Param("staff") String staff);
+                                   @Param("staff") String staff,
+                                   @Param("offset") int offset,
+                                   @Param("pageSize") int pageSize);
+
+    int countSearchEmployees(@Param("keyword") String keyword,
+                             @Param("gender") String gender,
+                             @Param("staff") String staff);
 
 }

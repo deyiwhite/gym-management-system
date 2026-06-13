@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,11 +33,15 @@ public class ApiMemberController {
     }
 
     @GetMapping("/search")
-    public Map<String, Object> searchMember(String keyword, String gender, Integer minRemain, Integer maxRemain) {
-        List<Member> memberList = memberService.searchMembers(keyword, gender, minRemain, maxRemain);
+    public Map<String, Object> searchMember(String keyword, String gender, Integer minRemain, Integer maxRemain,
+                                            @RequestParam(defaultValue = "1") int page,
+                                            @RequestParam(defaultValue = "10") int pageSize) {
+        List<Member> memberList = memberService.searchMembers(keyword, gender, minRemain, maxRemain, page, pageSize);
+        int total = memberService.countSearchMembers(keyword, gender, minRemain, maxRemain);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
         resp.put("memberList", memberList);
+        resp.put("total", total);
         return resp;
     }
 

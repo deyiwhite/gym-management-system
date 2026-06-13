@@ -1,11 +1,11 @@
 <template>
-  <div style="padding: 24px">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-      <h2 style="margin: 0">添加器材</h2>
+  <section class="form-page">
+    <div class="form-page-header">
+      <h2>添加器材</h2>
       <el-button @click="router.push('/equipment/selEquipment')">返回</el-button>
     </div>
 
-    <el-card style="max-width: 860px">
+    <el-card class="form-card" shadow="never">
       <el-form label-width="140px">
         <el-form-item label="器材名称">
           <el-input v-model="form.equipmentName" />
@@ -25,12 +25,13 @@
         </el-form-item>
       </el-form>
     </el-card>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { postForm } from '../api/client'
 
 const router = useRouter()
@@ -42,10 +43,10 @@ const form = reactive({
 })
 
 async function submit() {
-  if (!form.equipmentName) return alert('请输入器材名称！')
-  if (!form.equipmentLocation) return alert('请输入器材位置！')
-  if (!form.equipmentStatus) return alert('请输入器材状态！')
-  if (!form.equipmentMessage) return alert('请输入备注信息！')
+  if (!form.equipmentName) { ElMessage.error('请输入器材名称！'); return }
+  if (!form.equipmentLocation) { ElMessage.error('请输入器材位置！'); return }
+  if (!form.equipmentStatus) { ElMessage.error('请输入器材状态！'); return }
+  if (!form.equipmentMessage) { ElMessage.error('请输入备注信息！'); return }
 
   await postForm('/api/equipment/addEquipment', {
     equipmentName: form.equipmentName,
@@ -58,3 +59,15 @@ async function submit() {
 }
 </script>
 
+<style scoped>
+.form-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+h2 {
+  margin: 0;
+}
+</style>

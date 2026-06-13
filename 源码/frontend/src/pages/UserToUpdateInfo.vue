@@ -45,6 +45,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
@@ -64,7 +65,7 @@ function validatePhone(phone) {
 async function submit() {
   if (!member.value) return
   if (!validatePhone(member.value.memberPhone)) {
-    alert('手机号码错误！')
+    ElMessage.error('手机号码错误！')
     return
   }
   await postForm('/api/user/updateInfo', member.value)

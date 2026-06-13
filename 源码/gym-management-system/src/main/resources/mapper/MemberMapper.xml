@@ -112,6 +112,29 @@
             </if>
         </where>
         ORDER BY member_id ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countSearchMembers" resultType="int">
+        SELECT COUNT(*) FROM member
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    CAST(member_id AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+                    OR member_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR phone LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="gender != null and gender != ''">
+                AND gender = #{gender}
+            </if>
+            <if test="minRemain != null">
+                AND remain_class_count &gt;= #{minRemain}
+            </if>
+            <if test="maxRemain != null">
+                AND remain_class_count &lt;= #{maxRemain}
+            </if>
+        </where>
     </select>
 
 </mapper>

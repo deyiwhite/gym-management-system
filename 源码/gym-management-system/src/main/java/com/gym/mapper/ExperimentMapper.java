@@ -52,4 +52,19 @@ public interface ExperimentMapper {
 
     // 查询(9g): GROUP BY + HAVING
     List<Map<String, Object>> query9g_groupByHaving(Double minAvg);
+
+    // 实验三: 数据修改
+    int finishCourse(int classId);
+    int cancelCourse(int classId);
+    int cancelMember(int memberId);
+
+    // 实验四: 视图查询
+    List<Map<String, Object>> queryViewAll();
+    List<Map<String, Object>> queryViewHighRating();
+    List<Map<String, Object>> queryViewMemberAvg();
+
+    // 实验五: 库函数 + 授权
+    List<Map<String, Object>> queryMemberStats();
+    void grantDemo();
+    void revokeDemo();
 }

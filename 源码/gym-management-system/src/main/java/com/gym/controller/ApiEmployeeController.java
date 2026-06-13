@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
@@ -33,11 +34,15 @@ public class ApiEmployeeController {
     }
 
     @GetMapping("/search")
-    public Map<String, Object> searchEmployee(String keyword, String gender, String staff) {
-        List<Employee> employeeList = employeeService.searchEmployees(keyword, gender, staff);
+    public Map<String, Object> searchEmployee(String keyword, String gender, String staff,
+                                              @RequestParam(defaultValue = "1") int page,
+                                              @RequestParam(defaultValue = "10") int pageSize) {
+        List<Employee> employeeList = employeeService.searchEmployees(keyword, gender, staff, page, pageSize);
+        int total = employeeService.countSearchEmployees(keyword, gender, staff);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
         resp.put("employeeList", employeeList);
+        resp.put("total", total);
         return resp;
     }
 
