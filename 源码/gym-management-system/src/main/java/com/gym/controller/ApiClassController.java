@@ -71,6 +71,16 @@ public class ApiClassController {
         return resp;
     }
 
+    @GetMapping("/dashboard")
+    public Map<String, Object> dashboard() {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("summary", classTableService.selectAnalysisSummary());
+        resp.put("topByRating", classTableService.selectDashboardTopByRating());
+        resp.put("topByEnrollment", classTableService.selectDashboardTopByEnrollment());
+        return resp;
+    }
+
     @GetMapping("/toAddClass")
     public Map<String, Object> toAddClass() {
         Map<String, Object> resp = new HashMap<>();

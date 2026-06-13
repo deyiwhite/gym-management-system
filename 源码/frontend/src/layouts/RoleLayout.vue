@@ -1,7 +1,10 @@
 <template>
   <el-container class="role-layout">
     <el-aside width="240px" class="role-aside">
-      <div class="role-title">健身房管理系统</div>
+      <div class="role-brand">
+        <div class="role-title">健身房管理系统</div>
+        <div class="role-subtitle">Gym Operations Console</div>
+      </div>
 
       <el-menu
         :router="true"
@@ -18,6 +21,7 @@
           <el-menu-item index="/employee/selEmployee">员工管理</el-menu-item>
           <el-menu-item index="/equipment/selEquipment">器材管理</el-menu-item>
           <el-menu-item index="/class/selClass">课程管理</el-menu-item>
+          <el-menu-item index="/class/analysis">课程运营分析</el-menu-item>
         </template>
 
         <template v-else>
@@ -64,7 +68,9 @@ const activePath = computed(() => route.path)
   width: 100%;
   min-width: 0;
   align-items: flex-start;
-  background: #f4f6f9;
+  background:
+    linear-gradient(180deg, rgba(47, 126, 247, 0.08), transparent 320px),
+    #eef3f8;
 }
 
 .role-aside {
@@ -74,6 +80,8 @@ const activePath = computed(() => route.path)
   display: flex;
   flex-direction: column;
   flex: 0 0 240px;
+  box-sizing: border-box;
+  padding: 24px 14px 16px;
   background:
     radial-gradient(circle at 20% 0%, rgba(79, 140, 255, 0.22), transparent 34%),
     linear-gradient(180deg, #2c3e56, #223146);
@@ -81,12 +89,21 @@ const activePath = computed(() => route.path)
   box-shadow: 8px 0 24px rgba(31, 45, 64, 0.14);
 }
 
+.role-brand {
+  padding: 0 10px 22px;
+}
+
 .role-title {
-  padding: 24px 20px 26px;
   font-size: 21px;
   font-weight: 800;
   line-height: 1.25;
   color: #ffffff;
+}
+
+.role-subtitle {
+  margin-top: 8px;
+  color: #91a3b7;
+  font-size: 12px;
 }
 
 .role-menu {
@@ -125,7 +142,7 @@ const activePath = computed(() => route.path)
 }
 
 .role-footer {
-  margin: auto 14px 16px;
+  margin-top: auto;
   padding: 14px 13px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -148,6 +165,8 @@ const activePath = computed(() => route.path)
   min-width: 0;
   padding: 24px 32px;
   overflow: auto;
-  background: #eef3f8;
+  background:
+    linear-gradient(180deg, rgba(47, 126, 247, 0.08), transparent 320px),
+    #eef3f8;
 }
 </style>

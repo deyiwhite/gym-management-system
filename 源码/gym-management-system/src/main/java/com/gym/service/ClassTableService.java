@@ -28,4 +28,8 @@ public interface ClassTableService {
 
     int countCourseAnalysisRows();
 
+    List<Map<String, Object>> selectDashboardTopByRating();
+
+    List<Map<String, Object>> selectDashboardTopByEnrollment();
+
 }

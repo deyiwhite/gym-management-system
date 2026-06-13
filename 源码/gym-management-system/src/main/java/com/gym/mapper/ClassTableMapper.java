@@ -32,4 +32,8 @@ public interface ClassTableMapper {
 
     int countCourseAnalysisRows();
 
+    List<Map<String, Object>> selectDashboardTopByRating();
+
+    List<Map<String, Object>> selectDashboardTopByEnrollment();
+
 }

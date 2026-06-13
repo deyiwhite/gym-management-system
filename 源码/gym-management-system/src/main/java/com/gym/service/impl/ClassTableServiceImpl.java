@@ -59,4 +59,14 @@ public class ClassTableServiceImpl implements ClassTableService {
     public int countCourseAnalysisRows() {
         return classTableMapper.countCourseAnalysisRows();
     }
+
+    @Override
+    public List<Map<String, Object>> selectDashboardTopByRating() {
+        return classTableMapper.selectDashboardTopByRating();
+    }
+
+    @Override
+    public List<Map<String, Object>> selectDashboardTopByEnrollment() {
+        return classTableMapper.selectDashboardTopByEnrollment();
+    }
 }

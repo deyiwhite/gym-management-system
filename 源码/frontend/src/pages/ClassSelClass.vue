@@ -3,15 +3,14 @@
     <div class="page-header">
       <div>
         <h2>课程管理</h2>
-        <p>维护课程信息，查看报名记录，并通过课程分析掌握报名、容量与评价情况。</p>
+        <p>维护课程信息，查看报名记录。</p>
       </div>
       <el-button type="primary" @click="router.push('/class/toAddClass')">添加课程信息</el-button>
     </div>
 
-    <el-radio-group v-model="activeTab" class="view-switch" @change="handleTabChange">
+    <el-radio-group v-model="activeTab" class="view-switch">
       <el-radio-button value="list">课程列表</el-radio-button>
       <el-radio-button value="records">报名记录</el-radio-button>
-      <el-radio-button value="analysis">课程分析</el-radio-button>
     </el-radio-group>
 
     <section v-if="activeTab === 'list'" class="panel">
@@ -144,92 +143,6 @@
       <el-empty v-if="recordsTouched && !recordsLoading && !recordList.length" description="暂无报名记录" />
     </section>
 
-    <section v-if="activeTab === 'analysis'" class="panel">
-      <div class="summary-grid">
-        <button class="summary-card" type="button">
-          <span>课程总数</span>
-          <strong>{{ summaryNumber(analysis.summary.courseTotal) }}</strong>
-        </button>
-        <button class="summary-card" type="button">
-          <span>报名总数</span>
-          <strong>{{ summaryNumber(analysis.summary.registrationTotal) }}</strong>
-        </button>
-        <button class="summary-card" type="button">
-          <span>平均评分</span>
-          <strong>{{ summaryRating(analysis.summary.averageRating) }}</strong>
-        </button>
-        <button class="summary-card is-action" type="button" @click="showUnratedRecords">
-          <span>未评分记录</span>
-          <strong>{{ summaryNumber(analysis.summary.unratedTotal) }}</strong>
-        </button>
-      </div>
-
-      <el-card class="analysis-card" shadow="never">
-        <template #header>
-          <div class="analysis-header">
-            <div>
-              <h3>课程运营分析</h3>
-              <p>按报名热度排序，综合查看容量利用率和评价表现。</p>
-            </div>
-            <button class="plain-action" type="button" :disabled="analysisLoading" @click="refreshAnalysis">
-              {{ analysisLoading ? '刷新中' : '刷新数据' }}
-            </button>
-          </div>
-        </template>
-
-        <el-table v-loading="analysisLoading" :data="analysis.rows" class="data-table">
-          <el-table-column label="排名" width="80">
-            <template #default="scope">{{ scope.$index + 1 }}</template>
-          </el-table-column>
-          <el-table-column prop="className" label="课程名" />
-          <el-table-column prop="coach" label="教练" width="130">
-            <template #default="scope">{{ scope.row.coach || '未安排' }}</template>
-          </el-table-column>
-          <el-table-column label="已报名 / 容量" width="150">
-            <template #default="scope">
-              {{ numberValue(scope.row.enrolledCount) }} / {{ capacityText(scope.row.maxCapacity) }}
-            </template>
-          </el-table-column>
-          <el-table-column label="利用率" min-width="220">
-            <template #default="scope">
-              <div class="usage-cell">
-                <el-progress
-                  :percentage="progressPercent(scope.row.capacityUsage)"
-                  :color="usageColor(scope.row.capacityUsage)"
-                  :show-text="false"
-                />
-                <el-tag :type="usageTagType(scope.row.capacityUsage)" size="small">
-                  {{ usageText(scope.row.capacityUsage, scope.row.maxCapacity) }}
-                </el-tag>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="平均评分" width="120">
-            <template #default="scope">
-              <el-tag v-if="scope.row.averageRating != null" :type="ratingType(scope.row.averageRating)">
-                {{ Number(scope.row.averageRating).toFixed(1) }}
-              </el-tag>
-              <span v-else class="muted">暂无评分</span>
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <div v-if="analysis.total" class="table-footer">
-          <span>共 {{ analysis.total }} 门课程</span>
-          <el-pagination
-            v-model:current-page="analysisPage"
-            v-model:page-size="analysisPageSize"
-            :page-sizes="[10, 15, 20]"
-            :total="analysis.total"
-            background
-            layout="sizes, prev, pager, next"
-            @current-change="handleAnalysisPageChange"
-            @size-change="handleAnalysisSizeChange"
-          />
-        </div>
-      </el-card>
-    </section>
-
     <el-dialog v-model="detailVisible" :title="detail.cur?.className || '课程详情'" width="620px">
       <template v-if="detail.cur">
         <el-descriptions :column="2" border>
@@ -272,11 +185,9 @@ const classFilters = reactive({ keyword: '', capacityStatus: '' })
 const recordList = ref([])
 const recordsLoading = ref(false)
 const recordsTouched = ref(false)
-const analysisLoading = ref(false)
 let pageActive = true
 let classRequestController = null
 let recordRequestController = null
-let analysisRequestController = null
 let detailRequestController = null
 
 const recordFilters = reactive({
@@ -286,20 +197,6 @@ const recordFilters = reactive({
   ratingStatus: '',
   lowRating: '',
   highRating: ''
-})
-
-const analysisPage = ref(1)
-const analysisPageSize = ref(10)
-const analysis = reactive({
-  loaded: false,
-  total: 0,
-  summary: {
-    courseTotal: 0,
-    registrationTotal: 0,
-    averageRating: 0,
-    unratedTotal: 0
-  },
-  rows: []
 })
 
 const detailVisible = ref(false)
@@ -356,14 +253,6 @@ function numberValue(value) {
   return Number(value || 0)
 }
 
-function summaryNumber(value) {
-  return numberValue(value)
-}
-
-function summaryRating(value) {
-  return Number(value || 0).toFixed(1)
-}
-
 function capacityText(value) {
   const capacity = Number(value || 0)
   return capacity > 0 ? capacity : '未设置容量'
@@ -376,25 +265,12 @@ function progressPercent(value) {
   return percent
 }
 
-function usageText(value, maxCapacity) {
-  if (!Number(maxCapacity || 0)) return '未设置容量'
-  return `${Number(value || 0).toFixed(1)}%`
-}
-
 function usageColor(value) {
   const percent = Number(value || 0)
   if (percent >= 100) return '#ef4444'
   if (percent >= 90) return '#f59e0b'
   if (percent >= 60) return '#22c55e'
   return '#cbd5e1'
-}
-
-function usageTagType(value) {
-  const percent = Number(value || 0)
-  if (percent >= 100) return 'danger'
-  if (percent >= 90) return 'warning'
-  if (percent >= 60) return 'success'
-  return 'info'
 }
 
 function courseStatusKey(course) {
@@ -485,46 +361,6 @@ async function loadRecords() {
   }
 }
 
-async function loadAnalysis() {
-  if (analysisLoading.value) return
-  analysisRequestController?.abort()
-  const controller = new AbortController()
-  analysisRequestController = controller
-  analysisLoading.value = true
-  try {
-    const params = { page: analysisPage.value, pageSize: analysisPageSize.value }
-    const resp = await api.get('/api/class/analysis', { params, signal: controller.signal })
-    if (!pageActive || controller.signal.aborted) return
-    analysis.summary = resp.data?.summary || analysis.summary
-    analysis.rows = resp.data?.courseAnalysisRows || []
-    analysis.total = resp.data?.total || 0
-    analysis.loaded = true
-  } catch (error) {
-    if (!isCanceled(error)) throw error
-  } finally {
-    if (analysisRequestController === controller) {
-      analysisRequestController = null
-      analysisLoading.value = false
-    }
-  }
-}
-
-function handleAnalysisPageChange(p) {
-  analysisPage.value = p
-  loadAnalysis().catch(() => {})
-}
-
-function handleAnalysisSizeChange(s) {
-  analysisPageSize.value = s
-  analysisPage.value = 1
-  loadAnalysis().catch(() => {})
-}
-
-function refreshAnalysis() {
-  analysisPage.value = 1
-  loadAnalysis().catch(() => {})
-}
-
 async function showDetail(classId) {
   detailRequestController?.abort()
   const controller = new AbortController()
@@ -543,24 +379,8 @@ async function showDetail(classId) {
   }
 }
 
-function handleTabChange(tab) {
-  if (tab === 'analysis' && !analysis.loaded && !analysisLoading.value) {
-    requestAnimationFrame(() => {
-      if (pageActive && activeTab.value === 'analysis') loadAnalysis().catch(() => {})
-    })
-  }
-}
-
 function openRecords(classId) {
   recordFilters.classId = String(classId)
-  activeTab.value = 'records'
-  loadRecords().catch(() => {})
-}
-
-function showUnratedRecords() {
-  recordFilters.ratingStatus = 'unrated'
-  recordFilters.lowRating = ''
-  recordFilters.highRating = ''
   activeTab.value = 'records'
   loadRecords().catch(() => {})
 }
@@ -580,7 +400,6 @@ async function delClass(classId) {
   try { await ElMessageBox.confirm('确定要删除该课程吗？', '删除确认', { type: 'warning' }) } catch { return }
   await postForm('/api/class/delClass', { classId })
   await loadClasses()
-  if (analysis.loaded) await loadAnalysis()
 }
 
 onMounted(() => {
@@ -601,10 +420,8 @@ onActivated(() => {
 onDeactivated(() => {
   pageActive = false
   recordsLoading.value = false
-  analysisLoading.value = false
   classRequestController?.abort()
   recordRequestController?.abort()
-  analysisRequestController?.abort()
   detailRequestController?.abort()
 })
 
@@ -612,7 +429,6 @@ onBeforeUnmount(() => {
   pageActive = false
   classRequestController?.abort()
   recordRequestController?.abort()
-  analysisRequestController?.abort()
   detailRequestController?.abort()
 })
 </script>
@@ -622,8 +438,7 @@ onBeforeUnmount(() => {
   min-width: 0;
 }
 
-.page-header,
-.analysis-header {
+.page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -632,7 +447,6 @@ onBeforeUnmount(() => {
 }
 
 h2,
-h3,
 p {
   margin: 0;
 }
@@ -640,12 +454,6 @@ p {
 h2 {
   color: #0d1b2f;
   font-size: 26px;
-  font-weight: 800;
-}
-
-h3 {
-  color: #0d1b2f;
-  font-size: 18px;
   font-weight: 800;
 }
 
@@ -775,61 +583,6 @@ p,
   font-size: 13px;
 }
 
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.summary-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-height: 96px;
-  padding: 18px;
-  border: 1px solid #e3eaf3;
-  border-radius: 14px;
-  background: #ffffff;
-  color: #111827;
-  cursor: default;
-  text-align: left;
-  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
-}
-
-.summary-card span {
-  color: #718095;
-  font-size: 14px;
-}
-
-.summary-card strong {
-  margin-top: 10px;
-  font-size: 30px;
-  line-height: 1;
-}
-
-.summary-card.is-action {
-  cursor: pointer;
-}
-
-.summary-card.is-action:hover {
-  border-color: #2f7ef7;
-  box-shadow: 0 14px 30px rgba(47, 126, 247, 0.12);
-}
-
-.analysis-card {
-  border: 1px solid #e3eaf3;
-  border-radius: 14px;
-  box-shadow: 0 10px 22px rgba(30, 50, 77, 0.045);
-}
-
-.usage-cell {
-  display: grid;
-  grid-template-columns: minmax(120px, 1fr) auto;
-  gap: 12px;
-  align-items: center;
-}
-
 .tag {
   margin-right: 8px;
 }
@@ -841,10 +594,6 @@ p,
 
   .class-filter-form {
     grid-template-columns: repeat(2, minmax(160px, 1fr));
-  }
-
-  .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 </style>

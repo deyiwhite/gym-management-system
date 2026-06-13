@@ -90,4 +90,33 @@
         SELECT COUNT(*) FROM class_table
     </select>
 
+    <select id="selectDashboardTopByRating" resultType="map">
+        SELECT ct.class_id AS classId,
+               ct.class_name AS className,
+               e.employee_name AS coach,
+               COUNT(cr.record_id) AS enrolledCount,
+               ROUND(AVG(cr.rating), 1) AS averageRating
+        FROM class_table ct
+        LEFT JOIN class_record cr ON ct.class_id = cr.class_id
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        WHERE cr.rating IS NOT NULL
+        GROUP BY ct.class_id, ct.class_name, e.employee_name
+        ORDER BY AVG(cr.rating) DESC
+        LIMIT 5
+    </select>
+
+    <select id="selectDashboardTopByEnrollment" resultType="map">
+        SELECT ct.class_id AS classId,
+               ct.class_name AS className,
+               e.employee_name AS coach,
+               COUNT(cr.record_id) AS enrolledCount,
+               ROUND(AVG(cr.rating), 1) AS averageRating
+        FROM class_table ct
+        LEFT JOIN class_record cr ON ct.class_id = cr.class_id
+        LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        GROUP BY ct.class_id, ct.class_name, e.employee_name
+        ORDER BY COUNT(cr.record_id) DESC
+        LIMIT 8
+    </select>
+
 </mapper>

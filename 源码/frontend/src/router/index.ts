@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import api from '../api/client'
 
 const routes = [
@@ -24,6 +24,7 @@ const routes = [
   { path: '/class/selClass', component: () => import('../pages/ClassSelClass.vue'), meta: { requiresAuth: true, role: 'admin' } },
   { path: '/class/toAddClass', component: () => import('../pages/ClassToAddClass.vue'), meta: { requiresAuth: true, role: 'admin' } },
   { path: '/class/selClassRecord', component: () => import('../pages/ClassSelClassRecord.vue'), meta: { requiresAuth: true, role: 'admin' } },
+  { path: '/class/analysis', component: () => import('../pages/ClassAnalysis.vue'), meta: { requiresAuth: true, role: 'admin' } },
 
   { path: '/user/toUserInfo', component: () => import('../pages/UserToUserInfo.vue'), meta: { requiresAuth: true, role: 'user' } },
   { path: '/user/toUpdateInfo', component: () => import('../pages/UserToUpdateInfo.vue'), meta: { requiresAuth: true, role: 'user' } },
@@ -34,7 +35,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 })
 
