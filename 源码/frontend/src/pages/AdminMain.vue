@@ -28,14 +28,18 @@
 
     <div class="quick-section">
       <div class="section-title">快捷入口</div>
-      <el-row :gutter="16">
-        <el-col v-for="link in quickLinks" :key="link.label" :xs="12" :sm="8" :lg="4">
-          <div class="quick-card" @click="router.push(link.path)">
-            <el-icon :size="22"><component :is="link.icon" /></el-icon>
-            <span>{{ link.label }}</span>
-          </div>
-        </el-col>
-      </el-row>
+      <div class="quick-grid">
+        <div
+          v-for="link in quickLinks"
+          :key="link.label"
+          class="quick-card"
+          :style="{ '--q-color': link.color, '--q-bg': link.bg }"
+          @click="router.push(link.path)"
+        >
+          <el-icon :size="22"><component :is="link.icon" /></el-icon>
+          <span>{{ link.label }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -62,11 +66,11 @@ const statCards = computed(() => [
 ])
 
 const quickLinks = [
-  { label: '会员管理', path: '/member/selMember', icon: User },
-  { label: '员工管理', path: '/employee/selEmployee', icon: Avatar },
-  { label: '课程管理', path: '/class/selClass', icon: Calendar },
-  { label: '器材管理', path: '/equipment/selEquipment', icon: Cpu },
-  { label: '会员卡查询', path: '/member/toSelByCard', icon: CreditCard }
+  { label: '会员管理', path: '/member/selMember', icon: User, color: '#3b82f6', bg: '#eff6ff' },
+  { label: '员工管理', path: '/employee/selEmployee', icon: Avatar, color: '#10b981', bg: '#ecfdf5' },
+  { label: '课程管理', path: '/class/selClass', icon: Calendar, color: '#f59e0b', bg: '#fffbeb' },
+  { label: '器材管理', path: '/equipment/selEquipment', icon: Cpu, color: '#8b5cf6', bg: '#f5f3ff' },
+  { label: '会员卡查询', path: '/member/toSelByCard', icon: CreditCard, color: '#ef4444', bg: '#fff1f2' }
 ]
 
 async function load() {
@@ -138,7 +142,7 @@ onMounted(() => {
 }
 
 .stats-row {
-  margin-bottom: 28px;
+  margin-bottom: 64px;
 }
 
 .stat-card {
@@ -200,31 +204,52 @@ onMounted(() => {
 }
 
 .section-title {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   color: #374151;
   font-size: 14px;
   font-weight: 600;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 132px);
+  gap: 14px;
+  justify-content: center;
 }
 
 .quick-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  min-height: 84px;
-  padding: 16px 8px;
+  justify-content: center;
+  gap: 7px;
+  height: 78px;
+  padding: 10px 8px;
   border: 1px solid #f0f0f0;
   border-radius: 10px;
+  background: #ffffff;
   color: #4b5563;
   cursor: pointer;
-  font-size: 13px;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  font-size: 12px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .quick-card:hover {
-  border-color: #bfdbfe;
-  background: #f0f7ff;
-  color: #2563eb;
+  border-color: var(--q-color);
+  background: var(--q-bg);
+  color: var(--q-color);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  transform: translateY(-2px);
+}
+
+.quick-card :deep(.el-icon) {
+  color: var(--q-color);
+}
+
+@media (max-width: 1080px) {
+  .quick-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
@@ -239,6 +264,10 @@ onMounted(() => {
 
   .logout-btn {
     width: fit-content;
+  }
+
+  .quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 </style>
