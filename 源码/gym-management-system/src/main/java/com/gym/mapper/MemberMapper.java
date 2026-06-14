@@ -21,13 +21,13 @@ public interface MemberMapper {
     Member selectByAccountAndPassword(Member member);
 
     //根据会员账号删除会员信息
-    Boolean deleteByMemberAccount(Integer memberAccount);
+    Boolean deleteByMemberAccount(String memberAccount);
 
     //查询会员数
     Integer selectTotalCount();
 
     //根据会员账号查询会员
-    List<Member> selectByMemberAccount(Integer memberAccount);
+    List<Member> selectByMemberAccount(String memberAccount);
 
     List<Member> searchMembers(@Param("keyword") String keyword,
                                @Param("gender") String gender,
@@ -40,5 +40,10 @@ public interface MemberMapper {
                            @Param("gender") String gender,
                            @Param("minRemain") Integer minRemain,
                            @Param("maxRemain") Integer maxRemain);
+
+    String selectMaxNoByYear(@Param("yearPrefix") String yearPrefix);
+
+    int updateRemainClassCount(@Param("memberAccount") String memberAccount,
+                               @Param("delta") int delta);
 
 }

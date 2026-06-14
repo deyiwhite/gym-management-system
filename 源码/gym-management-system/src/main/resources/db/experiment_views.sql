@@ -3,7 +3,7 @@
 -- when you imported an older schema without the view section.
 
 CREATE OR REPLACE VIEW v_member_course_rating AS
-SELECT m.member_id,
+SELECT m.member_no,
        m.member_name,
        m.gender,
        ct.class_id,
@@ -15,4 +15,5 @@ SELECT m.member_id,
 FROM member m
 JOIN class_record cr ON m.member_id = cr.member_id
 JOIN class_table ct ON cr.class_id = ct.class_id
-WHERE cr.rating IS NOT NULL;
+WHERE cr.status = 1
+  AND cr.rating IS NOT NULL;

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -30,11 +31,15 @@ public class ApiEquipmentController {
     }
 
     @GetMapping("/search")
-    public Map<String, Object> searchEquipment(String keyword, String location, String status) {
-        List<Equipment> equipmentList = equipmentService.searchEquipment(keyword, location, status);
+    public Map<String, Object> searchEquipment(String keyword, String location, String status,
+                                               @RequestParam(defaultValue = "1") int page,
+                                               @RequestParam(defaultValue = "10") int pageSize) {
+        List<Equipment> equipmentList = equipmentService.searchEquipment(keyword, location, status, page, pageSize);
+        int total = equipmentService.countSearchEquipment(keyword, location, status);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
         resp.put("equipmentList", equipmentList);
+        resp.put("total", total);
         return resp;
     }
 

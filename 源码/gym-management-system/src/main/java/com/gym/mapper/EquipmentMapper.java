@@ -31,5 +31,11 @@ public interface EquipmentMapper {
 
     List<Equipment> searchEquipment(@Param("keyword") String keyword,
                                     @Param("location") String location,
-                                    @Param("status") String status);
+                                    @Param("status") String status,
+                                    @Param("offset") int offset,
+                                    @Param("pageSize") int pageSize);
+
+    int countSearchEquipment(@Param("keyword") String keyword,
+                             @Param("location") String location,
+                             @Param("status") String status);
 }

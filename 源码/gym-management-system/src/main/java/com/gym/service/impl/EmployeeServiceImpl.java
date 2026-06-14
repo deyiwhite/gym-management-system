@@ -20,7 +20,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Boolean deleteByEmployeeAccount(Integer employeeAccount) {
+    public Boolean deleteByEmployeeAccount(String employeeAccount) {
         return employeeMapper.deleteByEmployeeAccount(employeeAccount);
     }
 
@@ -35,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> selectByEmployeeAccount(Integer employeeAccount) {
+    public List<Employee> selectByEmployeeAccount(String employeeAccount) {
         return employeeMapper.selectByEmployeeAccount(employeeAccount);
     }
 
@@ -55,5 +55,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public int countSearchEmployees(String keyword, String gender, String staff) {
         return employeeMapper.countSearchEmployees(keyword, gender, staff);
+    }
+
+    @Override
+    public String selectMaxEmployeeNo() {
+        return employeeMapper.selectMaxEmployeeNo();
     }
 }

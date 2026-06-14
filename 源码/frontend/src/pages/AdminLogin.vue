@@ -25,7 +25,7 @@
               <rect x="70" y="124" width="60" height="10" rx="5" fill="#fff" opacity="0.45" />
               <path
                 d="M75 55l6-6 12 12 24-24 6 6-30 30z"
-                fill="#3B82F6"
+                fill="#10B981"
                 stroke="#fff"
                 stroke-width="2"
               />
@@ -156,7 +156,7 @@ async function submit() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e8edf5 0%, #d5dff0 30%, #c8d6f0 60%, #e0e7f5 100%);
+  background: linear-gradient(135deg, #edf5f0 0%, #dcebe4 34%, #cfe3d8 68%, #eef7f2 100%);
   overflow: hidden;
 }
 
@@ -171,7 +171,7 @@ async function submit() {
 .bg-circle {
   position: absolute;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(59, 130, 246, 0.04));
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(16, 185, 129, 0.04));
 }
 
 .bg-circle--1 {
@@ -204,7 +204,7 @@ async function submit() {
   left: 0;
   width: 200%;
   height: 200px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(59, 130, 246, 0.02));
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.07), rgba(16, 185, 129, 0.02));
   clip-path: path('M0 200 C200 100, 400 150, 600 100 C800 50, 1000 120, 1200 80 C1400 40, 1600 110, 1800 90 C1900 80, 2000 60, 2000 60 L2000 200 Z');
 }
 
@@ -245,7 +245,7 @@ async function submit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(160deg, #3B82F6 0%, #2563EB 40%, #1D4ED8 100%);
+  background: linear-gradient(160deg, #10B981 0%, #0EA66F 42%, #0B6B4A 100%);
   position: relative;
   overflow: hidden;
 }
@@ -321,10 +321,10 @@ async function submit() {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  background: linear-gradient(135deg, #10B981, #0EA66F);
   color: #fff;
   margin-bottom: 16px;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.32);
 }
 
 .form-title {
@@ -361,7 +361,7 @@ async function submit() {
 }
 
 .form-input :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #3B82F6 inset !important;
+  box-shadow: 0 0 0 1px #10B981 inset !important;
 }
 
 .form-input :deep(.el-input__prefix) {
@@ -381,14 +381,14 @@ async function submit() {
   border-radius: 8px;
   font-size: 16px;
   letter-spacing: 4px;
-  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  background: linear-gradient(135deg, #10B981, #0EA66F);
   border: none;
   transition: all 0.3s;
 }
 
 .login-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4B92FF, #3B82F6);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #22C55E, #10B981);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.38);
   transform: translateY(-1px);
 }
 

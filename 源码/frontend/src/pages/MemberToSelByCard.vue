@@ -10,8 +10,8 @@
 
     <el-card class="query-card" shadow="never">
       <el-form class="query-form" label-position="top">
-        <el-form-item label="会员卡号/账号">
-          <el-input v-model="memberAccount" placeholder="请输入会员卡号/账号" @keyup.enter="submit" />
+        <el-form-item label="会员卡号">
+          <el-input v-model="memberAccount" placeholder="请输入会员卡号" @keyup.enter="submit" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submit">查询</el-button>
@@ -22,7 +22,7 @@
     <el-card v-if="noMessage" class="empty-card" shadow="never">{{ noMessage }}</el-card>
 
     <el-table :data="memberList" class="data-table" v-else>
-      <el-table-column prop="memberAccount" label="会员账号/卡号" width="160" />
+      <el-table-column prop="memberAccount" label="会员卡号" width="160" />
       <el-table-column prop="memberName" label="姓名" />
       <el-table-column prop="cardTime" label="办卡时间" width="140" />
       <el-table-column prop="memberGender" label="性别" width="90" />
@@ -55,7 +55,7 @@ const noMessage = ref('')
 async function submit() {
   noMessage.value = ''
   memberList.value = []
-  const account = Number(memberAccount.value || 0)
+  const account = String(memberAccount.value || '').trim()
   if (!account) { ElMessage.error('请输入会员卡号！'); return }
 
   const resp = await postForm('/api/member/selByCard', { memberAccount: account })

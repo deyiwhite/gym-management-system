@@ -27,5 +27,7 @@ public interface EquipmentService {
     //根据课程ID查询器械
     List<Equipment> selectByClassId(Integer classId);
 
-    List<Equipment> searchEquipment(String keyword, String location, String status);
+    List<Equipment> searchEquipment(String keyword, String location, String status, int page, int pageSize);
+
+    int countSearchEquipment(String keyword, String location, String status);
 }

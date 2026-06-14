@@ -20,7 +20,7 @@
     </resultMap>
 
     <select id="findAll" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, cr.member_id, m.member_name,
+        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -32,11 +32,13 @@
 
     <insert id="insertRecord" parameterType="com.gym.pojo.ClassRecord">
         INSERT INTO class_record (member_id, class_id)
-        VALUES (#{memberId}, #{classId})
+        SELECT member_id, #{classId}
+        FROM member
+        WHERE member_no = #{memberId}
     </insert>
 
-    <select id="selectByMemberId" parameterType="java.lang.Integer" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, cr.member_id, m.member_name,
+    <select id="selectByMemberId" parameterType="java.lang.String" resultMap="ClassRecordVOMap">
+        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -44,24 +46,41 @@
         JOIN member m ON cr.member_id = m.member_id
         JOIN class_table ct ON cr.class_id = ct.class_id
         LEFT JOIN employee e ON ct.coach_id = e.employee_id
-        WHERE cr.member_id = #{memberId}
+        WHERE m.member_no = #{memberId}
     </select>
 
     <delete id="deleteByRecordId" parameterType="java.lang.Integer">
         DELETE FROM class_record WHERE record_id = #{recordId}
     </delete>
 
+    <select id="selectByRecordId" parameterType="java.lang.Integer" resultType="com.gym.pojo.ClassRecord">
+        SELECT cr.record_id, m.member_no AS member_id, cr.class_id, cr.join_time,
+               cr.status, cr.total_sessions, cr.completed_sessions, cr.rating
+        FROM class_record cr
+        JOIN member m ON cr.member_id = m.member_id
+        WHERE record_id = #{recordId}
+    </select>
+
     <select id="selectByClassIdAndMemberId" resultType="com.gym.pojo.ClassRecord">
-        SELECT * FROM class_record
-        WHERE class_id = #{classId} AND member_id = #{memberId}
+        SELECT cr.record_id, m.member_no AS member_id, cr.class_id, cr.join_time,
+               cr.status, cr.total_sessions, cr.completed_sessions, cr.rating
+        FROM class_record cr
+        JOIN member m ON cr.member_id = m.member_id
+        WHERE cr.class_id = #{classId} AND m.member_no = #{memberId}
     </select>
 
     <select id="countByClassId" parameterType="java.lang.Integer" resultType="int">
         SELECT count(*) FROM class_record WHERE class_id = #{classId}
     </select>
 
+    <select id="countActiveByClassId" parameterType="java.lang.Integer" resultType="int">
+        SELECT count(*) FROM class_record
+        WHERE class_id = #{classId}
+          AND status &lt;&gt; 2
+    </select>
+
     <select id="selectByClassId" parameterType="java.lang.Integer" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, cr.member_id, m.member_name,
+        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -72,8 +91,41 @@
         WHERE cr.class_id = #{classId}
     </select>
 
+    <sql id="RecordSearchWhere">
+        <where>
+            <if test="classId != null">
+                AND cr.class_id = #{classId}
+            </if>
+            <if test="memberKeyword != null and memberKeyword != ''">
+                AND (
+                    m.member_no LIKE CONCAT('%', #{memberKeyword}, '%')
+                    OR m.member_name LIKE CONCAT('%', #{memberKeyword}, '%')
+                )
+            </if>
+            <if test="status != null">
+                AND cr.status = #{status}
+            </if>
+            <choose>
+                <when test='ratingStatus != null and ratingStatus == "unrated"'>
+                    AND cr.rating IS NULL
+                </when>
+                <when test='ratingStatus != null and ratingStatus == "rated"'>
+                    AND cr.rating IS NOT NULL
+                </when>
+                <otherwise>
+                    <if test="lowRating != null">
+                        AND cr.rating &gt;= #{lowRating}
+                    </if>
+                    <if test="highRating != null">
+                        AND cr.rating &lt;= #{highRating}
+                    </if>
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
     <select id="searchRecords" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, cr.member_id, m.member_name,
+        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -81,32 +133,41 @@
         JOIN member m ON cr.member_id = m.member_id
         JOIN class_table ct ON cr.class_id = ct.class_id
         LEFT JOIN employee e ON ct.coach_id = e.employee_id
+        <include refid="RecordSearchWhere"/>
+        ORDER BY cr.join_time DESC, cr.record_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countSearchRecords" resultType="int">
+        SELECT COUNT(*)
+        FROM class_record cr
+        <if test="memberKeyword != null and memberKeyword != ''">
+            JOIN member m ON cr.member_id = m.member_id
+        </if>
+        <include refid="RecordSearchWhere"/>
+    </select>
+
+    <select id="selectRatingView" resultType="map">
+        SELECT member_no AS memberId,
+               member_name AS memberName,
+               gender,
+               class_id AS classId,
+               class_name AS className,
+               record_id AS recordId,
+               join_time AS joinTime,
+               status,
+               rating
+        FROM v_member_course_rating
         <where>
-            <if test="classId != null">
-                AND cr.class_id = #{classId}
+            <if test="minRating != null">
+                AND rating &gt;= #{minRating}
             </if>
-            <if test="memberKeyword != null and memberKeyword != ''">
-                AND (
-                    CAST(cr.member_id AS CHAR) LIKE CONCAT('%', #{memberKeyword}, '%')
-                    OR m.member_name LIKE CONCAT('%', #{memberKeyword}, '%')
-                )
-            </if>
-            <if test="status != null">
-                AND cr.status = #{status}
-            </if>
-            <if test="ratingStatus != null and ratingStatus == 'unrated'">
-                AND cr.rating IS NULL
-            </if>
-            <if test="ratingStatus == null or ratingStatus != 'unrated'">
-                <if test="lowRating != null">
-                    AND cr.rating &gt;= #{lowRating}
-                </if>
-                <if test="highRating != null">
-                    AND cr.rating &lt;= #{highRating}
-                </if>
+            <if test="gender != null and gender != ''">
+                AND gender = #{gender}
             </if>
         </where>
-        ORDER BY cr.join_time DESC, cr.record_id DESC
+        ORDER BY rating DESC, join_time DESC, record_id DESC
+        LIMIT #{limit}
     </select>
 
 </mapper>

@@ -50,7 +50,15 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public List<Equipment> searchEquipment(String keyword, String location, String status) {
-        return equipmentMapper.searchEquipment(keyword, location, status);
+    public List<Equipment> searchEquipment(String keyword, String location, String status, int page, int pageSize) {
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 10;
+        int offset = (page - 1) * pageSize;
+        return equipmentMapper.searchEquipment(keyword, location, status, offset, pageSize);
+    }
+
+    @Override
+    public int countSearchEquipment(String keyword, String location, String status) {
+        return equipmentMapper.countSearchEquipment(keyword, location, status);
     }
 }

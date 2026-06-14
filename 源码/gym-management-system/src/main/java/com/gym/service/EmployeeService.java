@@ -10,7 +10,7 @@ public interface EmployeeService {
     List<Employee> findAll();
 
     //根据员工账号删除员工
-    Boolean deleteByEmployeeAccount(Integer employeeAccount);
+    Boolean deleteByEmployeeAccount(String employeeAccount);
 
     //添加新员工
     Boolean insertEmployee(Employee employee);
@@ -19,7 +19,7 @@ public interface EmployeeService {
     Boolean updateMemberByEmployeeAccount(Employee employee);
 
     //根据员工账号查询员工
-    List<Employee> selectByEmployeeAccount(Integer employeeAccount);
+    List<Employee> selectByEmployeeAccount(String employeeAccount);
 
     //查询员工数
     Integer selectTotalCount();
@@ -27,5 +27,7 @@ public interface EmployeeService {
     List<Employee> searchEmployees(String keyword, String gender, String staff, int page, int pageSize);
 
     int countSearchEmployees(String keyword, String gender, String staff);
+
+    String selectMaxEmployeeNo();
 
 }

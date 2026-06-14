@@ -7,9 +7,9 @@
     <select id="findAll" resultType="equipment">
         SELECT equipment_id,
                equipment_name,
-               location     AS equipment_location,
-               status       AS equipment_status,
-               remark       AS equipment_message
+               location AS equipment_location,
+               status AS equipment_status,
+               remark AS equipment_message
         FROM equipment
     </select>
 
@@ -35,9 +35,9 @@
     <select id="selectByEquipmentId" parameterType="java.lang.Integer" resultType="equipment">
         SELECT equipment_id,
                equipment_name,
-               location     AS equipment_location,
-               status       AS equipment_status,
-               remark       AS equipment_message
+               location AS equipment_location,
+               status AS equipment_status,
+               remark AS equipment_message
         FROM equipment
         WHERE equipment_id = #{equipmentId}
     </select>
@@ -49,9 +49,9 @@
     <select id="selectByClassId" parameterType="java.lang.Integer" resultType="equipment">
         SELECT e.equipment_id,
                e.equipment_name,
-               e.location     AS equipment_location,
-               e.status       AS equipment_status,
-               e.remark       AS equipment_message
+               e.location AS equipment_location,
+               e.status AS equipment_status,
+               e.remark AS equipment_message
         FROM equipment e
         JOIN class_equipment ce ON e.equipment_id = ce.equipment_id
         WHERE ce.class_id = #{classId}
@@ -60,9 +60,9 @@
     <select id="searchEquipment" resultType="equipment">
         SELECT equipment_id,
                equipment_name,
-               location     AS equipment_location,
-               status       AS equipment_status,
-               remark       AS equipment_message
+               location AS equipment_location,
+               status AS equipment_status,
+               remark AS equipment_message
         FROM equipment
         <where>
             <if test="keyword != null and keyword != ''">
@@ -79,6 +79,25 @@
             </if>
         </where>
         ORDER BY equipment_id ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countSearchEquipment" resultType="int">
+        SELECT COUNT(*) FROM equipment
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    CAST(equipment_id AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+                    OR equipment_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="location != null and location != ''">
+                AND location LIKE CONCAT('%', #{location}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
     </select>
 
 </mapper>

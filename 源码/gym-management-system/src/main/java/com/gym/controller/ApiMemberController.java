@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @RestController
 @RequestMapping("/api/member")
@@ -54,14 +53,11 @@ public class ApiMemberController {
 
     @PostMapping("/addMember")
     public ResponseEntity<Map<String, Object>> addMember(Member member) {
-        Random random = new Random();
-        String account1 = "2021";
-        for (int i = 0; i < 5; i++) {
-            account1 += random.nextInt(10);
-        }
-        Integer account = Integer.parseInt(account1);
+        String yearPrefix = "2026";
+        String maxNo = memberService.selectMaxNoByYear(yearPrefix);
+        int sequence = maxNo == null ? 1 : Integer.parseInt(maxNo.substring(yearPrefix.length())) + 1;
+        String account = yearPrefix + String.format("%04d", sequence);
 
-        // 初始密码固定为 123456（与你原项目保持一致）
         String password = "123456";
 
         Date date = new Date();
@@ -83,7 +79,7 @@ public class ApiMemberController {
     }
 
     @PostMapping("/delMember")
-    public ResponseEntity<Map<String, Object>> deleteMember(Integer memberAccount) {
+    public ResponseEntity<Map<String, Object>> deleteMember(String memberAccount) {
         memberService.deleteByMemberAccount(memberAccount);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
@@ -91,7 +87,7 @@ public class ApiMemberController {
     }
 
     @GetMapping("/toUpdateMember")
-    public Map<String, Object> toUpdateMember(Integer memberAccount) {
+    public Map<String, Object> toUpdateMember(String memberAccount) {
         List<Member> memberList = memberService.selectByMemberAccount(memberAccount);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
@@ -115,7 +111,7 @@ public class ApiMemberController {
     }
 
     @PostMapping("/selByCard")
-    public Map<String, Object> selectByCardId(Integer memberAccount) {
+    public Map<String, Object> selectByCardId(String memberAccount) {
         List<Member> memberList = memberService.selectByMemberAccount(memberAccount);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);

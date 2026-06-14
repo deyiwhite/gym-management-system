@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -55,12 +54,9 @@ public class ApiEmployeeController {
 
     @PostMapping("/addEmployee")
     public ResponseEntity<Map<String, Object>> addEmployee(Employee employee) {
-        Random random = new Random();
-        String account1 = "1010";
-        for (int i = 0; i < 5; i++) {
-            account1 += random.nextInt(10);
-        }
-        Integer account = Integer.parseInt(account1);
+        String maxNo = employeeService.selectMaxEmployeeNo();
+        int sequence = maxNo == null ? 1 : Integer.parseInt(maxNo) + 1;
+        String account = String.format("%03d", sequence);
 
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -77,7 +73,7 @@ public class ApiEmployeeController {
     }
 
     @PostMapping("/delEmployee")
-    public ResponseEntity<Map<String, Object>> deleteEmployee(Integer employeeAccount) {
+    public ResponseEntity<Map<String, Object>> deleteEmployee(String employeeAccount) {
         employeeService.deleteByEmployeeAccount(employeeAccount);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
@@ -85,7 +81,7 @@ public class ApiEmployeeController {
     }
 
     @GetMapping("/toUpdateEmployee")
-    public Map<String, Object> toUpdateEmployee(Integer employeeAccount) {
+    public Map<String, Object> toUpdateEmployee(String employeeAccount) {
         List<Employee> employeeList = employeeService.selectByEmployeeAccount(employeeAccount);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);

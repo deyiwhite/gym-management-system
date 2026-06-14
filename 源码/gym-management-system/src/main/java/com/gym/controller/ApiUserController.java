@@ -9,6 +9,7 @@ import com.gym.service.ClassTableService;
 import com.gym.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,7 +68,7 @@ public class ApiUserController {
     @GetMapping("/toUserClass")
     public Map<String, Object> toUserClass(HttpSession session) {
         Member member = (Member) session.getAttribute("user");
-        Integer memberAccount = member == null ? null : member.getMemberAccount();
+        String memberAccount = member == null ? null : member.getMemberAccount();
         List<ClassRecordVO> recordList = classRecordService.selectByMemberId(memberAccount);
 
         Map<String, Object> resp = new HashMap<>();
@@ -77,12 +78,29 @@ public class ApiUserController {
         return resp;
     }
 
+    @Transactional
     @PostMapping("/delUserClass")
-    public ResponseEntity<Map<String, Object>> deleteUserClass(Integer recordId) {
+    public ResponseEntity<Map<String, Object>> deleteUserClass(Integer recordId, HttpSession session) {
+        Member member = (Member) session.getAttribute("user");
+        if (member == null) {
+            return fail("会话已失效");
+        }
+
+        ClassRecord record = classRecordService.selectByRecordId(recordId);
+        if (record == null) {
+            return fail("报名记录不存在");
+        }
+        if (!member.getMemberAccount().equals(record.getMemberId())) {
+            return fail("不能操作其他会员的报名记录");
+        }
+        if (record.getStatus() != null && record.getStatus() != 0) {
+            return fail("只能退未完成的课程");
+        }
+
         classRecordService.deleteByRecordId(recordId);
-        Map<String, Object> resp = new HashMap<>();
-        resp.put("success", true);
-        return ResponseEntity.ok(resp);
+        memberService.updateRemainClassCount(record.getMemberId(), 1);
+        refreshSessionUser(session, record.getMemberId());
+        return success();
     }
 
     @GetMapping("/toApplyClass")
@@ -96,30 +114,75 @@ public class ApiUserController {
         return resp;
     }
 
+    @Transactional
     @PostMapping("/applyClass")
     public ResponseEntity<Map<String, Object>> userApplyClass(Integer classId, HttpSession session) {
         ClassTable classTable = classTableService.selectByClassId(classId);
         Member member = (Member) session.getAttribute("user");
 
         if (classTable == null || member == null) {
-            Map<String, Object> resp = new HashMap<>();
-            resp.put("success", false);
-            resp.put("message", "会话已失效或课程不存在");
-            return ResponseEntity.ok(resp);
+            return fail("会话已失效或课程不存在");
         }
 
-        Integer memberId = member.getMemberAccount();
+        String memberId = member.getMemberAccount();
+        Member latestMember = findMember(memberId);
+        if (latestMember == null) {
+            return fail("会员不存在");
+        }
 
         ClassRecord exist = classRecordService.selectByClassIdAndMemberId(classId, memberId);
-        if (exist == null) {
-            ClassRecord record = new ClassRecord();
-            record.setMemberId(memberId);
-            record.setClassId(classId);
-            classRecordService.insertRecord(record);
+        if (exist != null) {
+            return fail("你已报名该课程");
         }
 
+        Integer maxCapacity = classTable.getMaxCapacity();
+        if (maxCapacity != null && maxCapacity > 0) {
+            int enrolledCount = classRecordService.countActiveByClassId(classId);
+            if (enrolledCount >= maxCapacity) {
+                return fail("课程名额已满");
+            }
+        }
+
+        Integer remainClassCount = latestMember.getCardNextClass();
+        if (remainClassCount == null || remainClassCount <= 0) {
+            return fail("剩余课时不足");
+        }
+
+        int updatedRows = memberService.updateRemainClassCount(memberId, -1);
+        if (updatedRows != 1) {
+            return fail("剩余课时不足");
+        }
+
+        ClassRecord record = new ClassRecord();
+        record.setMemberId(memberId);
+        record.setClassId(classId);
+        classRecordService.insertRecord(record);
+        refreshSessionUser(session, memberId);
+        return success();
+    }
+
+    private Member findMember(String memberAccount) {
+        List<Member> members = memberService.selectByMemberAccount(memberAccount);
+        return members == null || members.isEmpty() ? null : members.get(0);
+    }
+
+    private void refreshSessionUser(HttpSession session, String memberAccount) {
+        Member latestMember = findMember(memberAccount);
+        if (latestMember != null) {
+            session.setAttribute("user", latestMember);
+        }
+    }
+
+    private static ResponseEntity<Map<String, Object>> success() {
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
+        return ResponseEntity.ok(resp);
+    }
+
+    private static ResponseEntity<Map<String, Object>> fail(String message) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", false);
+        resp.put("message", message);
         return ResponseEntity.ok(resp);
     }
 }

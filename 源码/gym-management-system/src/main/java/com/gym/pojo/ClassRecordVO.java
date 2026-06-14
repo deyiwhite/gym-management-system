@@ -6,7 +6,7 @@ import java.util.Date;
 @Data
 public class ClassRecordVO {
     private Integer recordId;
-    private Integer memberId;
+    private String memberId;
     private String memberName;
     private Integer classId;
     private String className;

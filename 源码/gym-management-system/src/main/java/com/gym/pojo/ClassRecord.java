@@ -8,7 +8,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class ClassRecord {
     private Integer recordId;
-    private Integer memberId;
+    private String memberId;
     private Integer classId;
     private Date joinTime;
     private Integer status;

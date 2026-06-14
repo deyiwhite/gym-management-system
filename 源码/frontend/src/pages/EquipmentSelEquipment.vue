@@ -11,16 +11,21 @@
     <el-card class="filter-card" shadow="never">
       <el-form class="filter-form" :model="filters" label-position="top">
         <el-form-item label="关键词">
-          <el-input v-model="filters.keyword" clearable placeholder="器材编号 / 名称" @keyup.enter="search" />
+          <el-input v-model="filters.keyword" clearable placeholder="编号 / 名称" @keyup.enter="search" />
         </el-form-item>
         <el-form-item label="位置">
-          <el-input v-model="filters.location" clearable placeholder="区域或位置" @keyup.enter="search" />
+          <el-select v-model="filters.location" clearable placeholder="全部" filterable>
+            <el-option label="1号房间" value="1号房间" />
+            <el-option label="2号房间" value="2号房间" />
+            <el-option label="3号房间" value="3号房间" />
+          </el-select>
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="filters.status" clearable placeholder="全部">
             <el-option label="正常" value="正常" />
             <el-option label="损坏" value="损坏" />
             <el-option label="维修中" value="维修中" />
+            <el-option label="已报废" value="已报废" />
           </el-select>
         </el-form-item>
         <el-form-item class="filter-actions">
@@ -30,12 +35,12 @@
       </el-form>
     </el-card>
 
-    <el-table v-loading="loading" :data="pagedList" class="data-table">
+    <el-table v-loading="loading" :data="equipmentList" class="data-table">
       <el-table-column prop="equipmentId" label="器材ID" width="120" />
       <el-table-column prop="equipmentName" label="名称" />
       <el-table-column prop="equipmentLocation" label="位置" width="160" />
       <el-table-column prop="equipmentStatus" label="状态" width="120" />
-      <el-table-column prop="equipmentMessage" label="备注信息" />
+      <el-table-column prop="equipmentMessage" label="备注" />
       <el-table-column label="操作" width="180">
         <template #default="scope">
           <el-button size="small" type="info" @click="edit(scope.row.equipmentId)">编辑</el-button>
@@ -45,60 +50,77 @@
     </el-table>
 
     <div class="table-footer">
-      <span>共 {{ equipmentList.length }} 条</span>
+      <span>共 {{ total }} 条</span>
       <el-pagination
         v-model:current-page="page"
         v-model:page-size="pageSize"
         :page-sizes="[10, 20, 50]"
         layout="sizes, prev, pager, next"
-        :total="equipmentList.length"
+        :total="total"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
       />
     </div>
   </section>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
 const equipmentList = ref([])
+const total = ref(0)
 const loading = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ keyword: '', location: '', status: '' })
-
-const pagedList = computed(() => {
-  const start = (page.value - 1) * pageSize.value
-  return equipmentList.value.slice(start, start + pageSize.value)
-})
 
 async function load(params = {}) {
   loading.value = true
   try {
     const resp = await api.get('/api/equipment/search', { params })
     equipmentList.value = resp.data?.equipmentList || []
-    page.value = 1
+    total.value = resp.data?.total || 0
   } finally {
     loading.value = false
   }
 }
 
 function search() {
-  return load({
+  page.value = 1
+  return load(buildParams())
+}
+
+function buildParams() {
+  return {
     keyword: filters.keyword || undefined,
     location: filters.location || undefined,
-    status: filters.status || undefined
-  })
+    status: filters.status || undefined,
+    page: page.value,
+    pageSize: pageSize.value
+  }
 }
 
 function reset() {
   filters.keyword = ''
   filters.location = ''
   filters.status = ''
-  return load()
+  page.value = 1
+  return load(buildParams())
+}
+
+function handlePageChange(p) {
+  page.value = p
+  return load(buildParams())
+}
+
+function handleSizeChange(s) {
+  pageSize.value = s
+  page.value = 1
+  return load(buildParams())
 }
 
 function edit(equipmentId) {
@@ -112,13 +134,12 @@ async function del(equipmentId) {
 }
 
 onMounted(() => {
-  load().catch(() => {})
+  load(buildParams()).catch(() => {})
 })
 </script>
 
 <style scoped>
-.page-header,
-.filter-form {
+.page-header {
   display: flex;
   align-items: end;
   justify-content: space-between;
@@ -153,7 +174,9 @@ p {
 
 .filter-form {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(180px, 1fr) 140px auto;
+  grid-template-columns: minmax(200px, 260px) 170px 170px auto;
+  gap: 30px;
+  align-items: end;
 }
 
 .filter-form :deep(.el-form-item) {

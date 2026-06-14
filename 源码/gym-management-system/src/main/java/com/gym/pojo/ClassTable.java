@@ -9,7 +9,7 @@ public class ClassTable {
     private String classBegin;
     private String classTime;
     private String coach;
-    private Integer coachId;
+    private String coachId;
     private Integer classLevel;
     private Integer classDuration;
     private Integer maxCapacity;

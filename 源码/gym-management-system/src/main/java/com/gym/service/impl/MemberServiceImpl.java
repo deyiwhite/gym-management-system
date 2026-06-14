@@ -35,7 +35,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Boolean deleteByMemberAccount(Integer memberAccount) {
+    public Boolean deleteByMemberAccount(String memberAccount) {
         return memberMapper.deleteByMemberAccount(memberAccount);
     }
 
@@ -45,7 +45,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> selectByMemberAccount(Integer memberAccount) {
+    public List<Member> selectByMemberAccount(String memberAccount) {
         return memberMapper.selectByMemberAccount(memberAccount);
     }
 
@@ -60,5 +60,15 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public int countSearchMembers(String keyword, String gender, Integer minRemain, Integer maxRemain) {
         return memberMapper.countSearchMembers(keyword, gender, minRemain, maxRemain);
+    }
+
+    @Override
+    public String selectMaxNoByYear(String yearPrefix) {
+        return memberMapper.selectMaxNoByYear(yearPrefix);
+    }
+
+    @Override
+    public int updateRemainClassCount(String memberAccount, int delta) {
+        return memberMapper.updateRemainClassCount(memberAccount, delta);
     }
 }
