@@ -3,7 +3,7 @@
     <el-aside width="240px" class="role-aside">
       <div class="role-brand">
         <div class="role-title">健身房管理系统</div>
-        <div class="role-subtitle">Gym Operations Console</div>
+        <div class="role-subtitle">今日营业中</div>
       </div>
 
       <el-menu
@@ -69,8 +69,8 @@ const activePath = computed(() => route.path)
   min-width: 0;
   align-items: flex-start;
   background:
-    linear-gradient(180deg, rgba(47, 126, 247, 0.08), transparent 320px),
-    #eef3f8;
+    linear-gradient(180deg, rgba(16, 185, 129, 0.07), transparent 280px),
+    #edf5f0;
 }
 
 .role-aside {
@@ -83,8 +83,8 @@ const activePath = computed(() => route.path)
   box-sizing: border-box;
   padding: 24px 14px 16px;
   background:
-    radial-gradient(circle at 20% 0%, rgba(79, 140, 255, 0.22), transparent 34%),
-    linear-gradient(180deg, #2c3e56, #223146);
+    radial-gradient(circle at 20% 0%, rgba(30, 180, 120, 0.18), transparent 34%),
+    linear-gradient(180deg, #0b2318, #061410);
   color: #c8d3e2;
   box-shadow: 8px 0 24px rgba(31, 45, 64, 0.14);
 }
@@ -136,7 +136,7 @@ const activePath = computed(() => route.path)
 
 .role-menu :deep(.el-menu-item.is-active) {
   background: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 3px 0 0 #62a4ff;
+  box-shadow: inset 3px 0 0 #10b981;
   color: #ffffff;
   font-weight: 700;
 }
@@ -166,7 +166,7 @@ const activePath = computed(() => route.path)
   padding: 24px 32px;
   overflow: auto;
   background:
-    linear-gradient(180deg, rgba(47, 126, 247, 0.08), transparent 320px),
-    #eef3f8;
+    linear-gradient(180deg, rgba(16, 185, 129, 0.07), transparent 280px),
+    #edf5f0;
 }
 </style>

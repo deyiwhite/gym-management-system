@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>背景与侧栏配色方案</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #dfe5ee;
+      color: #172033;
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    }
+    h1 { margin: 0 0 18px; font-size: 22px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .item h2 { margin: 0 0 10px; font-size: 15px; }
+    .mock {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      min-height: 330px;
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, .12);
+      border-radius: 14px;
+      background: var(--bg);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, .14);
+    }
+    .side {
+      padding: 20px 12px;
+      background: var(--side);
+      color: var(--side-text);
+    }
+    .brand {
+      margin: 0 0 22px;
+      color: var(--side-title);
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .brand span {
+      display: block;
+      margin-top: 7px;
+      color: var(--side-muted);
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .nav { display: grid; gap: 6px; }
+    .nav div {
+      height: 36px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .nav div:first-child {
+      background: var(--active);
+      color: var(--active-text);
+      font-weight: 700;
+      box-shadow: inset 3px 0 0 var(--line);
+    }
+    .main {
+      padding: 22px;
+      background: var(--main);
+    }
+    .title {
+      width: 150px;
+      height: 22px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      background: var(--title);
+    }
+    .sub {
+      width: 230px;
+      height: 10px;
+      margin-bottom: 30px;
+      border-radius: 999px;
+      background: var(--sub);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .card {
+      height: 92px;
+      border: 1px solid var(--card-line);
+      border-radius: 12px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .a {
+      --bg: #f5efe4;
+      --main: linear-gradient(180deg, rgba(212, 175, 55, .12), transparent 260px), #f5efe4;
+      --side: radial-gradient(circle at 18% 0%, rgba(212,175,55,.24), transparent 34%), linear-gradient(180deg,#211912,#0f0c09);
+      --side-title: #fffaf0;
+      --side-text: #c9bca6;
+      --side-muted: rgba(255, 244, 222, .55);
+      --active: rgba(212,175,55,.16);
+      --active-text: #fff5d6;
+      --line: #d4af37;
+      --title: #1e1711;
+      --sub: rgba(86, 68, 49, .32);
+      --card: #fffaf0;
+      --card-line: rgba(86, 68, 49, .12);
+      --shadow: 0 12px 28px rgba(64, 45, 21, .08);
+    }
+    .b {
+      --bg: #f7fbff;
+      --main: linear-gradient(180deg, rgba(35, 119, 255, .10), transparent 260px), #f7fbff;
+      --side: radial-gradient(circle at 20% 0%, rgba(68,149,255,.28), transparent 34%), linear-gradient(180deg,#102944,#07182a);
+      --side-title: #ffffff;
+      --side-text: #a8bfd8;
+      --side-muted: rgba(200, 222, 246, .6);
+      --active: rgba(68,149,255,.16);
+      --active-text: #ffffff;
+      --line: #4da3ff;
+      --title: #0c1f35;
+      --sub: rgba(74, 105, 137, .28);
+      --card: #ffffff;
+      --card-line: rgba(33, 72, 112, .10);
+      --shadow: 0 12px 28px rgba(30, 80, 130, .08);
+    }
+    .c {
+      --bg: #111923;
+      --main: radial-gradient(circle at 76% 0%, rgba(60, 255, 174, .10), transparent 34%), linear-gradient(180deg,#172332,#111923);
+      --side: radial-gradient(circle at 22% 0%, rgba(60,255,174,.34), transparent 34%), linear-gradient(180deg,#07130f,#030706);
+      --side-title: #f5fff9;
+      --side-text: #8ba59b;
+      --side-muted: rgba(189, 221, 207, .5);
+      --active: rgba(60,255,174,.16);
+      --active-text: #eafff6;
+      --line: #3cffae;
+      --title: #eaf8ff;
+      --sub: rgba(191, 215, 226, .22);
+      --card: rgba(255,255,255,.075);
+      --card-line: rgba(184, 255, 224, .12);
+      --shadow: 0 14px 30px rgba(0,0,0,.22);
+    }
+    .d {
+      --bg: #f4faf7;
+      --main: linear-gradient(180deg, rgba(45,212,191,.12), transparent 260px), #f4faf7;
+      --side: radial-gradient(circle at 20% 0%, rgba(45,212,191,.22), transparent 34%), linear-gradient(180deg,#123f3b,#0b2524);
+      --side-title: #f3fffb;
+      --side-text: #a9d6cf;
+      --side-muted: rgba(218, 250, 244, .58);
+      --active: rgba(45,212,191,.14);
+      --active-text: #ffffff;
+      --line: #2dd4bf;
+      --title: #12332f;
+      --sub: rgba(54, 93, 86, .28);
+      --card: #ffffff;
+      --card-line: rgba(21, 94, 87, .10);
+      --shadow: 0 12px 28px rgba(21, 94, 87, .08);
+    }
+    .e {
+      --bg: #f4faf7;
+      --main: linear-gradient(180deg, rgba(45,212,191,.12), transparent 260px), #f4faf7;
+      --side: radial-gradient(circle at 22% 0%, rgba(60,255,174,.34), transparent 34%), linear-gradient(180deg,#07130f,#030706);
+      --side-title: #f5fff9;
+      --side-text: #8ba59b;
+      --side-muted: rgba(189, 221, 207, .5);
+      --active: rgba(60,255,174,.16);
+      --active-text: #eafff6;
+      --line: #3cffae;
+      --title: #12332f;
+      --sub: rgba(54, 93, 86, .28);
+      --card: #ffffff;
+      --card-line: rgba(21, 94, 87, .10);
+      --shadow: 0 12px 28px rgba(21, 94, 87, .08);
+    }
+  </style>
+</head>
+<body>
+  <h1>只换背景色 + 左侧栏背景色</h1>
+  <div class="grid">
+    <section class="item"><h2>A 深色侧栏 + 冰白背景</h2><div class="mock e"><aside class="side"><div class="brand">健身房管理系统<span>Gym Operations Console</span></div><div class="nav"><div>管理员主页</div><div>会员管理</div><div>课程管理</div><div>器材管理</div></div></aside><main class="main"><div class="title"></div><div class="sub"></div><div class="cards"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div></div></main></div></section>
+    <section class="item"><h2>B 冷白科技健身风</h2><div class="mock b"><aside class="side"><div class="brand">健身房管理系统<span>Gym Operations Console</span></div><div class="nav"><div>管理员主页</div><div>会员管理</div><div>课程管理</div><div>器材管理</div></div></aside><main class="main"><div class="title"></div><div class="sub"></div><div class="cards"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div></div></main></div></section>
+    <section class="item"><h2>C 暗色训练舱风</h2><div class="mock c"><aside class="side"><div class="brand">健身房管理系统<span>Gym Operations Console</span></div><div class="nav"><div>管理员主页</div><div>会员管理</div><div>课程管理</div><div>器材管理</div></div></aside><main class="main"><div class="title"></div><div class="sub"></div><div class="cards"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div></div></main></div></section>
+  </div>
+</body>
+</html>

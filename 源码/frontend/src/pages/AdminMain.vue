@@ -15,11 +15,14 @@
       <el-col v-for="item in statCards" :key="item.label" :xs="24" :sm="12" :lg="6">
         <div class="stat-card" :style="{ '--accent': item.color, '--accent-bg': item.bg }">
           <div class="stat-icon">
-            <el-icon :size="26"><component :is="item.icon" /></el-icon>
+            <span class="stat-glyph" :class="item.glyph"></span>
           </div>
           <div class="stat-body">
             <span class="stat-value">{{ item.value }}</span>
             <span class="stat-unit">{{ item.unit }}</span>
+            <span v-if="item.trend" class="stat-trend" :class="`trend-${item.trend}`" aria-hidden="true">
+              <span class="trend-count">{{ item.delta }}</span>
+            </span>
           </div>
           <div class="stat-label">{{ item.label }}</div>
         </div>
@@ -45,41 +48,112 @@
 </template>
 
 <script setup>
-import { Avatar, Calendar, Cpu, CreditCard, SwitchButton, User, UserFilled } from '@element-plus/icons-vue'
+import { Calendar, CreditCard, SuitcaseLine, SwitchButton, Tools, User } from '@element-plus/icons-vue'
 import { computed, onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
+const route = useRoute()
 const totals = reactive({
   memberTotal: 0,
   employeeTotal: 0,
   humanTotal: 0,
   equipmentTotal: 0
 })
+const trendState = reactive({
+  memberTotal: '',
+  employeeTotal: '',
+  humanTotal: '',
+  equipmentTotal: ''
+})
+const trendDelta = reactive({
+  memberTotal: 0,
+  employeeTotal: 0,
+  humanTotal: 0,
+  equipmentTotal: 0
+})
+
+const totalKeys = ['memberTotal', 'employeeTotal', 'humanTotal', 'equipmentTotal']
+const dailyTotalsCacheKey = 'gym-admin-main-daily-totals'
 
 const statCards = computed(() => [
-  { label: '健身房总人数', value: totals.humanTotal, unit: '人', icon: UserFilled, color: '#3b82f6', bg: '#eff6ff' },
-  { label: '员工人数', value: totals.employeeTotal, unit: '人', icon: Avatar, color: '#10b981', bg: '#ecfdf5' },
-  { label: '会员人数', value: totals.memberTotal, unit: '人', icon: User, color: '#f59e0b', bg: '#fffbeb' },
-  { label: '器材数量', value: totals.equipmentTotal, unit: '件', icon: Cpu, color: '#8b5cf6', bg: '#f5f3ff' }
+  { label: '健身房总人数', value: totals.humanTotal, unit: '人', glyph: 'user', color: '#3b82f6', bg: '#eff6ff', trend: trendState.humanTotal, delta: trendDelta.humanTotal },
+  { label: '员工人数', value: totals.employeeTotal, unit: '人', glyph: 'user', color: '#10b981', bg: '#ecfdf5', trend: trendState.employeeTotal, delta: trendDelta.employeeTotal },
+  { label: '会员人数', value: totals.memberTotal, unit: '人', glyph: 'user', color: '#f59e0b', bg: '#fffbeb', trend: trendState.memberTotal, delta: trendDelta.memberTotal },
+  { label: '器材数量', value: totals.equipmentTotal, unit: '件', glyph: 'dumbbell', color: '#8b5cf6', bg: '#f5f3ff', trend: trendState.equipmentTotal, delta: trendDelta.equipmentTotal }
 ])
 
 const quickLinks = [
+  { label: '会员卡查询', path: '/member/toSelByCard', icon: CreditCard, color: '#ef4444', bg: '#fff1f2' },
   { label: '会员管理', path: '/member/selMember', icon: User, color: '#3b82f6', bg: '#eff6ff' },
-  { label: '员工管理', path: '/employee/selEmployee', icon: Avatar, color: '#10b981', bg: '#ecfdf5' },
   { label: '课程管理', path: '/class/selClass', icon: Calendar, color: '#f59e0b', bg: '#fffbeb' },
-  { label: '器材管理', path: '/equipment/selEquipment', icon: Cpu, color: '#8b5cf6', bg: '#f5f3ff' },
-  { label: '会员卡查询', path: '/member/toSelByCard', icon: CreditCard, color: '#ef4444', bg: '#fff1f2' }
+  { label: '员工管理', path: '/employee/selEmployee', icon: SuitcaseLine, color: '#10b981', bg: '#ecfdf5' },
+  { label: '器材管理', path: '/equipment/selEquipment', icon: Tools, color: '#8b5cf6', bg: '#f5f3ff' }
 ]
 
 async function load() {
   const resp = await api.get('/api/toAdminMain')
   const data = resp.data || {}
-  totals.memberTotal = data.memberTotal || 0
-  totals.employeeTotal = data.employeeTotal || 0
-  totals.humanTotal = data.humanTotal || 0
-  totals.equipmentTotal = data.equipmentTotal || 0
+  const currentTotals = {
+    memberTotal: data.memberTotal || 0,
+    employeeTotal: data.employeeTotal || 0,
+    humanTotal: data.humanTotal || 0,
+    equipmentTotal: data.equipmentTotal || 0
+  }
+
+  totals.memberTotal = currentTotals.memberTotal
+  totals.employeeTotal = currentTotals.employeeTotal
+  totals.humanTotal = currentTotals.humanTotal
+  totals.equipmentTotal = currentTotals.equipmentTotal
+  updateDailyTrends(currentTotals)
+}
+
+function dateKey(dayOffset = 0) {
+  const date = new Date()
+  date.setDate(date.getDate() + dayOffset)
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function updateDailyTrends(currentTotals) {
+  if (String(route.query.demoTrend || '') === '1') {
+    trendState.humanTotal = 'up'
+    trendDelta.humanTotal = 2
+    trendState.employeeTotal = 'down'
+    trendDelta.employeeTotal = 1
+    trendState.memberTotal = 'up'
+    trendDelta.memberTotal = 3
+    trendState.equipmentTotal = ''
+    trendDelta.equipmentTotal = 0
+    return
+  }
+
+  try {
+    const snapshots = JSON.parse(localStorage.getItem(dailyTotalsCacheKey) || '{}')
+    const yesterdayTotals = snapshots[dateKey(-1)] || {}
+
+    totalKeys.forEach((key) => {
+      const yesterdayValue = Number(yesterdayTotals[key])
+      if (!Number.isFinite(yesterdayValue) || yesterdayValue === currentTotals[key]) {
+        trendState[key] = ''
+        trendDelta[key] = 0
+        return
+      }
+      trendState[key] = currentTotals[key] > yesterdayValue ? 'up' : 'down'
+      trendDelta[key] = Math.abs(currentTotals[key] - yesterdayValue)
+    })
+
+    snapshots[dateKey()] = currentTotals
+    localStorage.setItem(dailyTotalsCacheKey, JSON.stringify(snapshots))
+  } catch {
+    totalKeys.forEach((key) => {
+      trendState[key] = ''
+      trendDelta[key] = 0
+    })
+  }
 }
 
 async function logout() {
@@ -96,7 +170,9 @@ onMounted(() => {
 .admin-main {
   min-height: 100%;
   padding: 28px 32px;
-  background: #eef3f8;
+  background:
+    linear-gradient(180deg, rgba(16, 185, 129, 0.07), transparent 280px),
+    #edf5f0;
 }
 
 .page-header {
@@ -116,14 +192,14 @@ onMounted(() => {
 .page-title {
   margin: 0;
   color: #111827;
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 600;
 }
 
 .page-sub {
   margin: 0;
   color: #9ca3af;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .logout-btn {
@@ -173,6 +249,86 @@ onMounted(() => {
   color: var(--accent);
 }
 
+.stat-glyph {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.stat-glyph.user::before,
+.stat-glyph.user::after {
+  position: absolute;
+  left: 50%;
+  content: "";
+  transform: translateX(-50%);
+}
+
+.stat-glyph.user::before {
+  top: 1px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.stat-glyph.user::after {
+  bottom: 1px;
+  width: 17px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom: 0;
+}
+
+.stat-glyph.grid::before {
+  position: absolute;
+  inset: 2px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  content: "";
+}
+
+.stat-glyph.grid::after {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+}
+
+.stat-glyph.dumbbell {
+  width: 24px;
+  height: 18px;
+  transform: rotate(-18deg);
+}
+
+.stat-glyph.dumbbell::before {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 8px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.stat-glyph.dumbbell::after {
+  position: absolute;
+  inset: 3px 0;
+  border-left: 4px solid currentColor;
+  border-right: 4px solid currentColor;
+  box-shadow:
+    4px 0 0 -1px currentColor,
+    -4px 0 0 -1px currentColor;
+  content: "";
+}
+
 .stat-body {
   display: flex;
   align-items: baseline;
@@ -185,11 +341,77 @@ onMounted(() => {
   font-size: 34px;
   font-weight: 800;
   line-height: 1;
+  display: inline-block;
+  transition: font-size 0.25s ease, color 0.25s ease;
+}
+
+.stat-card:hover .stat-value {
+  font-size: 42px;
+  color: var(--accent);
 }
 
 .stat-unit {
   color: #8795a8;
   font-size: 14px;
+}
+
+.stat-trend {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 32px;
+  height: 22px;
+  margin-left: 12px;
+  padding-left: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stat-trend::before {
+  position: absolute;
+  left: 5px;
+  width: 3px;
+  height: 15px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.stat-trend::after {
+  position: absolute;
+  left: 1px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  content: "";
+}
+
+.trend-up {
+  color: #17b981;
+}
+
+.trend-up::before {
+  top: 6px;
+}
+
+.trend-up::after {
+  top: 1px;
+  border-bottom: 8px solid currentColor;
+}
+
+.trend-down {
+  color: #ef4444;
+}
+
+.trend-down::before {
+  top: 1px;
+}
+
+.trend-down::after {
+  bottom: 1px;
+  border-top: 8px solid currentColor;
 }
 
 .stat-label {
