@@ -14,11 +14,16 @@
           <el-input v-model="equipment.equipmentName" />
         </el-form-item>
         <el-form-item label="器材位置">
-          <el-input v-model="equipment.equipmentLocation" />
+          <el-select v-model="equipment.equipmentLocation" placeholder="请选择位置" filterable allow-create>
+            <el-option label="1号房间" value="1号房间" />
+            <el-option label="2号房间" value="2号房间" />
+            <el-option label="3号房间" value="3号房间" />
+          </el-select>
         </el-form-item>
         <el-form-item label="器材状态">
           <el-select v-model="equipment.equipmentStatus" style="width: 100%">
             <el-option label="正常" value="正常" />
+            <el-option label="损坏" value="损坏" />
             <el-option label="维修中" value="维修中" />
             <el-option label="已报废" value="已报废" />
           </el-select>
@@ -40,6 +45,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import api, { postForm } from '../api/client'
 
 const route = useRoute()
@@ -54,7 +60,11 @@ async function load() {
 }
 
 async function submit() {
-  if (!equipment.value) return
+  const eq = equipment.value
+  if (!eq) return
+  if (!eq.equipmentName) { ElMessage.error('器材名称不能为空！'); return }
+  if (!eq.equipmentLocation) { ElMessage.error('器材位置不能为空！'); return }
+  if (!eq.equipmentStatus) { ElMessage.error('请选择器材状态！'); return }
   await postForm('/api/equipment/updateEquipment', equipment.value)
   router.push('/equipment/selEquipment')
 }

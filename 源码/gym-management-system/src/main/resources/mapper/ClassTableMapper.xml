@@ -10,7 +10,7 @@
                ct.class_begin,
                ct.class_duration AS class_time,
                e.employee_name   AS coach,
-               e.employee_no     AS coachId,
+               e.employee_id     AS coachId,
                ct.class_level    AS classLevel,
                ct.class_duration AS classDuration,
                ct.max_capacity   AS maxCapacity,
@@ -25,7 +25,7 @@
         LEFT JOIN employee e ON ct.coach_id = e.employee_id
         LEFT JOIN class_record cr ON ct.class_id = cr.class_id
         GROUP BY ct.class_id, ct.class_name, ct.class_begin, ct.class_duration,
-                 e.employee_name, e.employee_no, ct.class_level, ct.max_capacity, ct.class_description, ct.price
+                 e.employee_name, e.employee_id, ct.class_level, ct.max_capacity, ct.class_description, ct.price
         ORDER BY ct.class_begin ASC, ct.class_id ASC
     </select>
 
@@ -37,7 +37,7 @@
         INSERT INTO class_table (class_id, class_name, class_begin, class_duration, class_level, coach_id, max_capacity, class_description, price)
         SELECT #{classId}, #{className}, #{classBegin}, #{classDuration}, #{classLevel}, employee_id, #{maxCapacity}, #{classDescription}, #{price}
         FROM employee
-        WHERE employee_no = #{coachId}
+        WHERE employee_id = #{coachId}
     </insert>
 
     <select id="selectByClassId" parameterType="java.lang.Integer" resultType="classTable">
@@ -46,7 +46,7 @@
                ct.class_begin,
                ct.class_duration AS class_time,
                e.employee_name   AS coach,
-               e.employee_no     AS coachId,
+               e.employee_id     AS coachId,
                ct.class_level    AS classLevel,
                ct.class_duration AS classDuration,
                ct.max_capacity   AS maxCapacity,

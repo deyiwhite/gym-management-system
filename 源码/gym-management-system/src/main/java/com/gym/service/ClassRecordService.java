@@ -16,10 +16,10 @@ public interface ClassRecordService {
     List<ClassRecordVO> selectByClassId(Integer classId);
     int countByClassId(Integer classId);
     int countActiveByClassId(Integer classId);
-    List<ClassRecordVO> searchRecords(Integer classId, String memberKeyword, Integer status,
+    List<ClassRecordVO> searchRecords(Integer classId, String className, String memberKeyword, Integer status,
                                       String ratingStatus, Double lowRating, Double highRating,
                                       int page, int pageSize);
-    int countSearchRecords(Integer classId, String memberKeyword, Integer status,
+    int countSearchRecords(Integer classId, String className, String memberKeyword, Integer status,
                            String ratingStatus, Double lowRating, Double highRating);
     List<Map<String, Object>> selectRatingView(Double minRating, String gender, int limit);
 }

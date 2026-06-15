@@ -9,7 +9,9 @@
       <el-table :data="recordList" style="width: 100%">
         <el-table-column prop="classId" label="编号" width="120" />
         <el-table-column prop="className" label="名称" />
-        <el-table-column prop="classBegin" label="时间" width="180" />
+        <el-table-column label="时间" width="180">
+          <template #default="scope">{{ formatDateTime(scope.row.classBegin) }}</template>
+        </el-table-column>
         <el-table-column prop="coachName" label="教练" width="160" />
         <el-table-column label="状态" width="100">
           <template #default="scope">
@@ -24,7 +26,15 @@
         </el-table-column>
         <el-table-column label="操作" width="160">
           <template #default="scope">
-            <el-button size="small" type="danger" @click="del(scope.row.recordId)">退课</el-button>
+            <el-button
+              v-if="scope.row.status === 0"
+              size="small"
+              type="danger"
+              @click="del(scope.row.recordId)"
+            >
+              退课
+            </el-button>
+            <el-tag v-else type="info" size="small">不可退课</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -54,6 +64,28 @@ function ratingType(r) {
   if (r >= 6.0) return ''
   if (r >= 5.0) return 'warning'
   return 'danger'
+}
+
+function padTime(value) {
+  return String(value).padStart(2, '0')
+}
+
+function formatDateTime(value) {
+  if (!value) return '-'
+  if (typeof value === 'string') {
+    const normalized = value.trim().replace('T', ' ')
+    const matched = normalized.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/)
+    if (matched) return `${matched[1]} ${matched[2]}`
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return String(value)
+
+  return [
+    date.getFullYear(),
+    padTime(date.getMonth() + 1),
+    padTime(date.getDate())
+  ].join('-') + ` ${padTime(date.getHours())}:${padTime(date.getMinutes())}`
 }
 
 async function load() {

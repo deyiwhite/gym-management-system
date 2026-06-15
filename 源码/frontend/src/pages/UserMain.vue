@@ -7,7 +7,7 @@
 
     <el-card v-if="member">
       <h3 style="margin: 0 0 12px 0">{{ member.memberName }} 的主页</h3>
-      <div style="color: #666">会员账号/卡号：{{ member.memberAccount }}</div>
+      <div style="color: #666">会员卡号：{{ member.memberAccount }}</div>
     </el-card>
     <el-card v-else>未登录或会话失效。</el-card>
   </div>

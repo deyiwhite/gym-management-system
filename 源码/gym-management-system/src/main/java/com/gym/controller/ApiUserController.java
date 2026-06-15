@@ -19,6 +19,8 @@ import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")
@@ -106,7 +108,17 @@ public class ApiUserController {
     @GetMapping("/toApplyClass")
     public Map<String, Object> toUserApplyClass(HttpSession session) {
         Member member = (Member) session.getAttribute("user");
+        String memberAccount = member == null ? null : member.getMemberAccount();
         List<ClassTable> classList = classTableService.findAll();
+        if (memberAccount != null) {
+            Set<Integer> appliedClassIds = classRecordService.selectByMemberId(memberAccount)
+                    .stream()
+                    .map(ClassRecordVO::getClassId)
+                    .collect(Collectors.toSet());
+            classList = classList.stream()
+                    .filter(classTable -> !appliedClassIds.contains(classTable.getClassId()))
+                    .collect(Collectors.toList());
+        }
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
         resp.put("member", member);

@@ -1,4 +1,6 @@
 SET NAMES utf8mb4;
+CREATE DATABASE IF NOT EXISTS `gym_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `gym_db`;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
@@ -38,16 +40,16 @@ CREATE TABLE `class_table`  (
 -- ----------------------------
 -- Records of class_table
 -- ----------------------------
-INSERT INTO `class_table` VALUES (1, '增肌', '2026年1月1日 15:00', 60, 1, 101038721, 55, '增肌训练课程', 200);
-INSERT INTO `class_table` VALUES (2, '瑜伽', '2026年1月2日 10:20', 90, 2, 101068283, 28, '瑜伽课程', 150);
-INSERT INTO `class_table` VALUES (3, '减脂', '2026年3月6日 18:00', 90, 2, 101053687, 48, '减脂训练课程', 180);
+INSERT INTO `class_table` VALUES (1, '增肌', '2026年1月1日 15:00', 60, 1, 101038721, 42, '增肌训练课程', 200);
+INSERT INTO `class_table` VALUES (2, '瑜伽', '2026年1月2日 10:20', 90, 2, 101068283, 20, '瑜伽课程', 150);
+INSERT INTO `class_table` VALUES (3, '减脂', '2026年3月6日 18:00', 90, 2, 101053687, 40, '减脂训练课程', 180);
 INSERT INTO `class_table` VALUES (4, '运动康复', '2026年2月2日 10:00', 45, 3, 101045354, 12, '运动康复课程', 300);
-INSERT INTO `class_table` VALUES (5, '综合格斗', '2026年2月3日 15:00', 60, 2, 101038721, 30, '综合格斗训练', 220);
+INSERT INTO `class_table` VALUES (5, '综合格斗', '2026年2月3日 15:00', 60, 2, 101038721, 20, '综合格斗训练', 220);
 INSERT INTO `class_table` VALUES (6, '塑形', '2026年2月3日 15:00', 60, 1, 101068283, 18, '塑形训练课程', 160);
 INSERT INTO `class_table` VALUES (7, '普拉提', '2026年3月1日 17:30', 60, 2, 101053687, 22, '普拉提课程', 200);
-INSERT INTO `class_table` VALUES (8, '爵士舞', '2026年2月22日 09:00', 90, 1, 101045354, 35, '爵士舞课程', 130);
+INSERT INTO `class_table` VALUES (8, '爵士舞', '2026年2月22日 09:00', 90, 1, 101045354, 28, '爵士舞课程', 130);
 INSERT INTO `class_table` VALUES (9, '杠铃操', '2026年2月4日 15:00', 60, 2, 101038721, 18, '杠铃操课程', 170);
-INSERT INTO `class_table` VALUES (10, '动感单车', '2026年3月8日 15:00', 45, 1, 101068283, 42, '动感单车课程', 120);
+INSERT INTO `class_table` VALUES (10, '动感单车', '2026年3月8日 15:00', 45, 1, 101068283, 34, '动感单车课程', 120);
 INSERT INTO `class_table` VALUES (11, '健美操', '2026年2月22日 18:00', 60, 1, 101053687, 20, '健美操课程', 140);
 
 
@@ -430,12 +432,31 @@ INSERT INTO `equipment` VALUES (5, '跑步机3', '2号房间', '正常', '');
 INSERT INTO `equipment` VALUES (6, '杠铃1', '1号房间', '正常', '');
 INSERT INTO `equipment` VALUES (7, '杠铃2', '1号房间', '正常', '');
 -- ----------------------------
+-- Records of class_equipment
+-- ----------------------------
+INSERT INTO `class_equipment` VALUES (1, 1);
+INSERT INTO `class_equipment` VALUES (1, 2);
+INSERT INTO `class_equipment` VALUES (2, 3);
+INSERT INTO `class_equipment` VALUES (3, 4);
+INSERT INTO `class_equipment` VALUES (4, 5);
+INSERT INTO `class_equipment` VALUES (5, 1);
+INSERT INTO `class_equipment` VALUES (5, 2);
+INSERT INTO `class_equipment` VALUES (6, 6);
+INSERT INTO `class_equipment` VALUES (7, 7);
+INSERT INTO `class_equipment` VALUES (8, 3);
+
+-- ----------------------------
 -- Indexes for query and analysis performance
 -- ----------------------------
+ALTER TABLE `class_record` ADD UNIQUE INDEX `uk_cr_member_class` (`member_id`, `class_id`);
 ALTER TABLE `class_record` ADD INDEX `idx_cr_member_id` (`member_id`);
 ALTER TABLE `class_record` ADD INDEX `idx_cr_class_id` (`class_id`);
 ALTER TABLE `class_record` ADD INDEX `idx_cr_rating` (`rating`);
 ALTER TABLE `class_record` ADD INDEX `idx_cr_class_rating` (`class_id`, `rating`);
+ALTER TABLE `class_record` ADD INDEX `idx_class_record_join_time_record` (`join_time` DESC, `record_id` DESC);
+ALTER TABLE `class_record` ADD INDEX `idx_class_record_class_time_record` (`class_id`, `join_time` DESC, `record_id` DESC);
+ALTER TABLE `class_record` ADD INDEX `idx_class_record_status_time_record` (`status`, `join_time` DESC, `record_id` DESC);
+ALTER TABLE `class_record` ADD INDEX `idx_class_record_rating_time_record` (`rating`, `join_time` DESC, `record_id` DESC);
 ALTER TABLE `class_table` ADD INDEX `idx_class_coach_id` (`coach_id`);
 ALTER TABLE `class_equipment` ADD INDEX `idx_ce_equipment_id` (`equipment_id`);
 ALTER TABLE `member` ADD INDEX `idx_member_name` (`member_name`);
@@ -473,6 +494,17 @@ ALTER TABLE `class_equipment`
 -- ----------------------------
 -- View for experiment 4: member course rating
 -- ----------------------------
+CREATE OR REPLACE VIEW `male_member_view` AS
+SELECT m.member_id,
+       m.member_name,
+       ct.class_name,
+       cr.rating
+FROM `member` m
+JOIN `class_record` cr ON m.member_id = cr.member_id
+JOIN `class_table` ct ON cr.class_id = ct.class_id
+WHERE m.gender = '男'
+  AND cr.rating IS NOT NULL;
+
 CREATE OR REPLACE VIEW `v_member_course_rating` AS
 SELECT m.member_id,
        m.member_name,
@@ -486,6 +518,94 @@ SELECT m.member_id,
 FROM `member` m
 JOIN `class_record` cr ON m.member_id = cr.member_id
 JOIN `class_table` ct ON cr.class_id = ct.class_id
-WHERE cr.rating IS NOT NULL;
+WHERE cr.status = 1
+  AND cr.rating IS NOT NULL;
+
+-- ----------------------------
+-- Triggers for maintaining remaining class count
+-- ----------------------------
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS `trg_class_record_insert`$$
+CREATE TRIGGER `trg_class_record_insert`
+AFTER INSERT ON `class_record`
+FOR EACH ROW
+BEGIN
+    UPDATE `member`
+    SET remain_class_count = remain_class_count - 1
+    WHERE member_id = NEW.member_id;
+END$$
+
+DROP TRIGGER IF EXISTS `trg_class_record_delete`$$
+CREATE TRIGGER `trg_class_record_delete`
+AFTER DELETE ON `class_record`
+FOR EACH ROW
+BEGIN
+    UPDATE `member`
+    SET remain_class_count = remain_class_count + 1
+    WHERE member_id = OLD.member_id;
+END$$
+
+-- ----------------------------
+-- Stored procedures for member course statistics
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `GetMemberStats`$$
+CREATE PROCEDURE `GetMemberStats`(IN mid INT)
+BEGIN
+    SELECT m.member_name,
+           COUNT(cr.record_id) AS course_count,
+           ROUND(IFNULL(AVG(cr.rating), 0), 1) AS avg_rating,
+           (SELECT ct.class_name
+            FROM class_record cr2
+            JOIN class_table ct ON cr2.class_id = ct.class_id
+            WHERE cr2.member_id = mid AND cr2.rating IS NOT NULL
+            ORDER BY cr2.rating DESC
+            LIMIT 1) AS favorite_course
+    FROM member m
+    LEFT JOIN class_record cr ON m.member_id = cr.member_id AND cr.rating IS NOT NULL
+    WHERE m.member_id = mid
+    GROUP BY m.member_id, m.member_name;
+END$$
+
+DROP PROCEDURE IF EXISTS `CalcMemberActivity`$$
+CREATE PROCEDURE `CalcMemberActivity`()
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE mid INT;
+    DECLARE cnt INT;
+    DECLARE avg_r DECIMAL(5,1);
+    DECLARE cur CURSOR FOR
+        SELECT cr.member_id, COUNT(*), IFNULL(AVG(cr.rating), 0)
+        FROM class_record cr
+        WHERE cr.rating IS NOT NULL
+        GROUP BY cr.member_id;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    DROP TEMPORARY TABLE IF EXISTS tmp_member_activity;
+    CREATE TEMPORARY TABLE tmp_member_activity (
+        member_id INT,
+        member_name VARCHAR(255),
+        activity DECIMAL(10,1)
+    );
+
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO mid, cnt, avg_r;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        INSERT INTO tmp_member_activity
+        SELECT mid, m.member_name, cnt * 10 + avg_r * 10
+        FROM member m
+        WHERE m.member_id = mid;
+    END LOOP;
+    CLOSE cur;
+
+    SELECT * FROM tmp_member_activity ORDER BY activity DESC;
+    DROP TEMPORARY TABLE IF EXISTS tmp_member_activity;
+END$$
+
+DELIMITER ;
 
 SET FOREIGN_KEY_CHECKS = 1;

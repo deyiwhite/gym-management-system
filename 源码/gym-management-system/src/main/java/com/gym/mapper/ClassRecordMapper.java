@@ -30,6 +30,7 @@ public interface ClassRecordMapper {
     int countActiveByClassId(Integer classId);
 
     List<ClassRecordVO> searchRecords(@Param("classId") Integer classId,
+                                      @Param("className") String className,
                                       @Param("memberKeyword") String memberKeyword,
                                       @Param("status") Integer status,
                                       @Param("ratingStatus") String ratingStatus,
@@ -39,6 +40,7 @@ public interface ClassRecordMapper {
                                       @Param("pageSize") int pageSize);
 
     int countSearchRecords(@Param("classId") Integer classId,
+                           @Param("className") String className,
                            @Param("memberKeyword") String memberKeyword,
                            @Param("status") Integer status,
                            @Param("ratingStatus") String ratingStatus,

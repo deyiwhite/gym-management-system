@@ -7,7 +7,7 @@
 
     <el-card v-if="member" style="max-width: 860px">
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="会员账号/卡号">{{ member.memberAccount }}</el-descriptions-item>
+        <el-descriptions-item label="会员卡号">{{ member.memberAccount }}</el-descriptions-item>
         <el-descriptions-item label="姓名">{{ member.memberName }}</el-descriptions-item>
         <el-descriptions-item label="性别">{{ member.memberGender }}</el-descriptions-item>
         <el-descriptions-item label="年龄">{{ member.memberAge }}</el-descriptions-item>

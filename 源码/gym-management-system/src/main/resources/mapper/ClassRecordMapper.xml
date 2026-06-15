@@ -20,7 +20,7 @@
     </resultMap>
 
     <select id="findAll" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
+        SELECT cr.record_id, m.member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -32,13 +32,11 @@
 
     <insert id="insertRecord" parameterType="com.gym.pojo.ClassRecord">
         INSERT INTO class_record (member_id, class_id)
-        SELECT member_id, #{classId}
-        FROM member
-        WHERE member_no = #{memberId}
+        VALUES (#{memberId}, #{classId})
     </insert>
 
     <select id="selectByMemberId" parameterType="java.lang.String" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
+        SELECT cr.record_id, m.member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -46,7 +44,7 @@
         JOIN member m ON cr.member_id = m.member_id
         JOIN class_table ct ON cr.class_id = ct.class_id
         LEFT JOIN employee e ON ct.coach_id = e.employee_id
-        WHERE m.member_no = #{memberId}
+        WHERE m.member_id = #{memberId}
     </select>
 
     <delete id="deleteByRecordId" parameterType="java.lang.Integer">
@@ -54,7 +52,7 @@
     </delete>
 
     <select id="selectByRecordId" parameterType="java.lang.Integer" resultType="com.gym.pojo.ClassRecord">
-        SELECT cr.record_id, m.member_no AS member_id, cr.class_id, cr.join_time,
+        SELECT cr.record_id, m.member_id, cr.class_id, cr.join_time,
                cr.status, cr.total_sessions, cr.completed_sessions, cr.rating
         FROM class_record cr
         JOIN member m ON cr.member_id = m.member_id
@@ -62,11 +60,11 @@
     </select>
 
     <select id="selectByClassIdAndMemberId" resultType="com.gym.pojo.ClassRecord">
-        SELECT cr.record_id, m.member_no AS member_id, cr.class_id, cr.join_time,
+        SELECT cr.record_id, m.member_id, cr.class_id, cr.join_time,
                cr.status, cr.total_sessions, cr.completed_sessions, cr.rating
         FROM class_record cr
         JOIN member m ON cr.member_id = m.member_id
-        WHERE cr.class_id = #{classId} AND m.member_no = #{memberId}
+        WHERE cr.class_id = #{classId} AND m.member_id = #{memberId}
     </select>
 
     <select id="countByClassId" parameterType="java.lang.Integer" resultType="int">
@@ -80,7 +78,7 @@
     </select>
 
     <select id="selectByClassId" parameterType="java.lang.Integer" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
+        SELECT cr.record_id, m.member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -96,9 +94,12 @@
             <if test="classId != null">
                 AND cr.class_id = #{classId}
             </if>
+            <if test="className != null and className != ''">
+                AND ct.class_name LIKE CONCAT('%', #{className}, '%')
+            </if>
             <if test="memberKeyword != null and memberKeyword != ''">
                 AND (
-                    m.member_no LIKE CONCAT('%', #{memberKeyword}, '%')
+                    m.member_id LIKE CONCAT('%', #{memberKeyword}, '%')
                     OR m.member_name LIKE CONCAT('%', #{memberKeyword}, '%')
                 )
             </if>
@@ -125,7 +126,7 @@
     </sql>
 
     <select id="searchRecords" resultMap="ClassRecordVOMap">
-        SELECT cr.record_id, m.member_no AS member_id, m.member_name,
+        SELECT cr.record_id, m.member_id, m.member_name,
                cr.class_id, ct.class_name, e.employee_name AS coach_name,
                ct.class_begin, cr.join_time, cr.status,
                cr.total_sessions, cr.completed_sessions, cr.rating
@@ -144,11 +145,14 @@
         <if test="memberKeyword != null and memberKeyword != ''">
             JOIN member m ON cr.member_id = m.member_id
         </if>
+        <if test="className != null and className != ''">
+            JOIN class_table ct ON cr.class_id = ct.class_id
+        </if>
         <include refid="RecordSearchWhere"/>
     </select>
 
     <select id="selectRatingView" resultType="map">
-        SELECT member_no AS memberId,
+        SELECT member_id AS memberId,
                member_name AS memberName,
                gender,
                class_id AS classId,

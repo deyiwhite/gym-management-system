@@ -34,7 +34,7 @@
     </el-card>
 
     <el-table v-loading="loading" :data="memberList" class="data-table">
-      <el-table-column prop="memberAccount" label="会员账号/卡号" width="140" />
+      <el-table-column prop="memberAccount" label="会员卡号" width="140" />
       <el-table-column prop="memberName" label="姓名" />
       <el-table-column prop="cardTime" label="办卡时间" width="140" />
       <el-table-column prop="memberGender" label="性别" width="80" />

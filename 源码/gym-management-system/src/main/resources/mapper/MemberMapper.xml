@@ -5,7 +5,7 @@
 <mapper namespace="com.gym.mapper.MemberMapper">
 
     <select id="findAll" resultType="member">
-        SELECT member_no        AS member_account,
+        SELECT member_id        AS member_account,
                member_password,
                member_name,
                gender           AS member_gender,
@@ -20,7 +20,7 @@
     </select>
 
     <insert id="insertMember" parameterType="member">
-        INSERT INTO member (member_no, member_password, member_name, gender, age,
+        INSERT INTO member (member_id, member_password, member_name, gender, age,
                             phone, register_date, total_class_count, remain_class_count)
         VALUES (#{memberAccount}, #{memberPassword}, #{memberName}, #{memberGender}, #{memberAge},
                 #{memberPhone}, #{cardTime}, #{cardClass}, #{cardNextClass})
@@ -35,11 +35,11 @@
             phone             = #{memberPhone},
             total_class_count = #{cardClass},
             remain_class_count = #{cardNextClass}
-        WHERE member_no = #{memberAccount}
+        WHERE member_id = #{memberAccount}
     </update>
 
     <select id="selectByAccountAndPassword" resultType="member">
-        SELECT member_no        AS member_account,
+        SELECT member_id        AS member_account,
                member_password,
                member_name,
                gender           AS member_gender,
@@ -51,13 +51,13 @@
                total_class_count AS card_class,
                remain_class_count AS card_next_class
         FROM member
-        WHERE member_no = #{memberAccount}
+        WHERE member_id = #{memberAccount}
           AND member_password = #{memberPassword}
     </select>
 
     <delete id="deleteByMemberAccount" parameterType="java.lang.String">
         DELETE FROM member
-        WHERE member_no = #{memberAccount}
+        WHERE member_id = #{memberAccount}
     </delete>
 
     <select id="selectTotalCount" resultType="java.lang.Integer">
@@ -65,7 +65,7 @@
     </select>
 
     <select id="selectByMemberAccount" parameterType="java.lang.String" resultType="member">
-        SELECT member_no        AS member_account,
+        SELECT member_id        AS member_account,
                member_password,
                member_name,
                gender           AS member_gender,
@@ -77,11 +77,11 @@
                total_class_count AS card_class,
                remain_class_count AS card_next_class
         FROM member
-        WHERE member_no = #{memberAccount}
+        WHERE member_id = #{memberAccount}
     </select>
 
     <select id="searchMembers" resultType="member">
-        SELECT member_no        AS member_account,
+        SELECT member_id        AS member_account,
                member_password,
                member_name,
                gender           AS member_gender,
@@ -96,7 +96,7 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (
-                    member_no LIKE CONCAT('%', #{keyword}, '%')
+                    member_id LIKE CONCAT('%', #{keyword}, '%')
                     OR member_name LIKE CONCAT('%', #{keyword}, '%')
                     OR phone LIKE CONCAT('%', #{keyword}, '%')
                 )
@@ -111,14 +111,14 @@
                 AND remain_class_count &lt;= #{maxRemain}
             </if>
         </where>
-        ORDER BY member_no ASC
+        ORDER BY member_id ASC
         LIMIT #{offset}, #{pageSize}
     </select>
 
     <select id="selectMaxNoByYear" resultType="java.lang.String">
-        SELECT MAX(member_no)
+        SELECT MAX(member_id)
         FROM member
-        WHERE member_no LIKE CONCAT(#{yearPrefix}, '%')
+        WHERE member_id LIKE CONCAT(#{yearPrefix}, '%')
     </select>
 
     <select id="countSearchMembers" resultType="int">
@@ -126,7 +126,7 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (
-                    member_no LIKE CONCAT('%', #{keyword}, '%')
+                    member_id LIKE CONCAT('%', #{keyword}, '%')
                     OR member_name LIKE CONCAT('%', #{keyword}, '%')
                     OR phone LIKE CONCAT('%', #{keyword}, '%')
                 )
@@ -146,7 +146,7 @@
     <update id="updateRemainClassCount">
         UPDATE member
         SET remain_class_count = remain_class_count + #{delta}
-        WHERE member_no = #{memberAccount}
+        WHERE member_id = #{memberAccount}
           AND remain_class_count + #{delta} &gt;= 0
     </update>
 

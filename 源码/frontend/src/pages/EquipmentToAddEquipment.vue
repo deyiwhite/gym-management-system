@@ -6,18 +6,27 @@
     </div>
 
     <el-card class="form-card" shadow="never">
-      <el-form label-width="140px">
+      <el-form label-width="120px">
         <el-form-item label="器材名称">
-          <el-input v-model="form.equipmentName" />
+          <el-input v-model="form.equipmentName" maxlength="30" />
         </el-form-item>
         <el-form-item label="器材位置">
-          <el-input v-model="form.equipmentLocation" />
+          <el-select v-model="form.equipmentLocation" placeholder="请选择位置" filterable allow-create>
+            <el-option label="1号房间" value="1号房间" />
+            <el-option label="2号房间" value="2号房间" />
+            <el-option label="3号房间" value="3号房间" />
+          </el-select>
         </el-form-item>
         <el-form-item label="器材状态">
-          <el-input v-model="form.equipmentStatus" />
+          <el-select v-model="form.equipmentStatus" placeholder="请选择状态">
+            <el-option label="正常" value="正常" />
+            <el-option label="损坏" value="损坏" />
+            <el-option label="维修中" value="维修中" />
+            <el-option label="已报废" value="已报废" />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注信息">
-          <el-input v-model="form.equipmentMessage" />
+          <el-input v-model="form.equipmentMessage" maxlength="100" />
         </el-form-item>
 
         <el-form-item>
@@ -45,8 +54,7 @@ const form = reactive({
 async function submit() {
   if (!form.equipmentName) { ElMessage.error('请输入器材名称！'); return }
   if (!form.equipmentLocation) { ElMessage.error('请输入器材位置！'); return }
-  if (!form.equipmentStatus) { ElMessage.error('请输入器材状态！'); return }
-  if (!form.equipmentMessage) { ElMessage.error('请输入备注信息！'); return }
+  if (!form.equipmentStatus) { ElMessage.error('请选择器材状态！'); return }
 
   await postForm('/api/equipment/addEquipment', {
     equipmentName: form.equipmentName,

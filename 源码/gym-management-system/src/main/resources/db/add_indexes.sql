@@ -2,6 +2,7 @@
 -- gym_management_system.sql already contains these indexes; run this file only
 -- when you imported an older schema without the index section.
 
+ALTER TABLE class_record ADD UNIQUE INDEX uk_cr_member_class (member_id, class_id);
 ALTER TABLE class_record ADD INDEX idx_cr_member_id (member_id);
 ALTER TABLE class_record ADD INDEX idx_cr_class_id (class_id);
 ALTER TABLE class_record ADD INDEX idx_cr_rating (rating);

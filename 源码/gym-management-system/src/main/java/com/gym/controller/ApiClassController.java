@@ -49,14 +49,23 @@ public class ApiClassController {
     }
 
     @GetMapping("/record/search")
-    public Map<String, Object> searchClassRecord(Integer classId, String memberKeyword, Integer status,
-                                                 String ratingStatus, Double lowRating, Double highRating) {
+    public Map<String, Object> searchClassRecord(Integer classId, String className, String memberKeyword, Integer status,
+                                                 String ratingStatus, Double lowRating, Double highRating,
+                                                 @RequestParam(defaultValue = "1") int page,
+                                                 @RequestParam(defaultValue = "20") int pageSize,
+                                                 @RequestParam(defaultValue = "true") boolean includeTotal) {
         List<ClassRecordVO> recordList = classRecordService.searchRecords(
-                classId, memberKeyword, status, ratingStatus, lowRating, highRating
+                classId, className, memberKeyword, status, ratingStatus, lowRating, highRating, page, pageSize
         );
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
         resp.put("classRecordList", recordList);
+        if (includeTotal) {
+            int total = classRecordService.countSearchRecords(
+                    classId, className, memberKeyword, status, ratingStatus, lowRating, highRating
+            );
+            resp.put("total", total);
+        }
         return resp;
     }
 
@@ -78,6 +87,16 @@ public class ApiClassController {
         resp.put("summary", classTableService.selectAnalysisSummary());
         resp.put("topByRating", classTableService.selectDashboardTopByRating());
         resp.put("topByEnrollment", classTableService.selectDashboardTopByEnrollment());
+        return resp;
+    }
+
+    @GetMapping("/ratingView")
+    public Map<String, Object> ratingView(Double minRating, String gender,
+                                          @RequestParam(defaultValue = "50") int limit) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("viewName", "v_member_course_rating");
+        resp.put("ratingRows", classRecordService.selectRatingView(minRating, gender, limit));
         return resp;
     }
 
@@ -113,8 +132,8 @@ public class ApiClassController {
     @Transactional
     @PostMapping("/delClass")
     public ResponseEntity<Map<String, Object>> deleteClass(Integer classId) {
-        classTableService.deleteClassByClassId(classId);
         classTableService.deleteRecordByClassId(classId);
+        classTableService.deleteClassByClassId(classId);
         Map<String, Object> resp = new HashMap<>();
         resp.put("success", true);
         return ResponseEntity.ok(resp);

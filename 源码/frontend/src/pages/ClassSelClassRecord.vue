@@ -5,7 +5,7 @@
         <h2>课程报名记录</h2>
         <p>
           课程编号: {{ classId || '全部' }}
-          <template v-if="className"> | 课程名称: {{ className }} | 开课时间: {{ classBegin }}</template>
+          <template v-if="className"> | 课程名称: {{ className }} | 开课时间: {{ formatDateTime(classBegin) }}</template>
         </p>
       </div>
     </div>
@@ -13,7 +13,9 @@
     <el-table :data="recordList" class="data-table">
       <el-table-column prop="memberId" label="会员ID" width="120" />
       <el-table-column prop="memberName" label="会员姓名" width="140" />
-      <el-table-column prop="joinTime" label="报名时间" width="180" />
+      <el-table-column label="报名时间" width="180">
+        <template #default="scope">{{ formatDateTime(scope.row.joinTime) }}</template>
+      </el-table-column>
       <el-table-column label="状态" width="110">
         <template #default="scope">
           <el-tag :type="statusType(scope.row.status)">{{ statusText(scope.row.status) }}</el-tag>
@@ -94,6 +96,28 @@ function ratingType(r) {
   if (r >= 6.0) return ''
   if (r >= 5.0) return 'warning'
   return 'danger'
+}
+
+function padTime(value) {
+  return String(value).padStart(2, '0')
+}
+
+function formatDateTime(value) {
+  if (!value) return '-'
+  if (typeof value === 'string') {
+    const normalized = value.trim().replace('T', ' ')
+    const matched = normalized.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/)
+    if (matched) return `${matched[1]} ${matched[2]}`
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return String(value)
+
+  return [
+    date.getFullYear(),
+    padTime(date.getMonth() + 1),
+    padTime(date.getDate())
+  ].join('-') + ` ${padTime(date.getHours())}:${padTime(date.getMinutes())}`
 }
 
 async function load() {

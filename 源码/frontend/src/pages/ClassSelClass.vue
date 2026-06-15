@@ -27,8 +27,23 @@
               <el-option label="零报名" value="empty" />
             </el-select>
           </el-form-item>
+          <el-form-item label="等级">
+            <el-select v-model="classFilters.level" clearable placeholder="全部">
+              <el-option label="入门" value="1" />
+              <el-option label="进阶" value="2" />
+              <el-option label="专业" value="3" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="时长">
+            <el-select v-model="classFilters.duration" clearable placeholder="全部">
+              <el-option label="45分钟" value="45" />
+              <el-option label="60分钟" value="60" />
+              <el-option label="90分钟" value="90" />
+            </el-select>
+          </el-form-item>
           <el-form-item class="class-filter-actions">
-            <el-button :disabled="!classFilters.keyword && !classFilters.capacityStatus" @click="resetClassFilters">
+            <el-button type="primary" @click="applyClassFilters">查询</el-button>
+            <el-button :disabled="!hasClassFilters" @click="resetClassFilters">
               重置
             </el-button>
           </el-form-item>
@@ -39,7 +54,7 @@
         <el-table-column prop="classId" label="编号" width="70" />
         <el-table-column label="名称" min-width="140">
           <template #default="scope">
-            <el-link type="primary" @click="showDetail(scope.row.classId)">{{ scope.row.className }}</el-link>
+            <el-link class="course-name-link" @click="showDetail(scope.row.classId)">{{ scope.row.className }}</el-link>
           </template>
         </el-table-column>
         <el-table-column label="已报名 / 容量" width="180">
@@ -62,8 +77,13 @@
         <el-table-column label="等级" width="80">
           <template #default="scope">{{ levelText(scope.row.classLevel) }}</template>
         </el-table-column>
-        <el-table-column prop="classBegin" label="开课时间" width="180" />
+        <el-table-column label="开课时间" width="180">
+          <template #default="scope">{{ formatDateTime(scope.row.classBegin) }}</template>
+        </el-table-column>
         <el-table-column prop="coach" label="教练" width="110" />
+        <el-table-column label="时长" width="90">
+          <template #default="scope">{{ scope.row.classTime || scope.row.classDuration }}分钟</template>
+        </el-table-column>
         <el-table-column label="价格" width="90">
           <template #default="scope">¥{{ scope.row.price }}</template>
         </el-table-column>
@@ -97,6 +117,9 @@
           <el-form-item label="课程编号">
             <el-input v-model="recordFilters.classId" clearable placeholder="如 1" />
           </el-form-item>
+          <el-form-item label="课程名称">
+            <el-input v-model="recordFilters.className" clearable placeholder="如 动感单车" />
+          </el-form-item>
           <el-form-item label="会员">
             <el-input v-model="recordFilters.memberKeyword" clearable placeholder="会员ID或姓名" />
           </el-form-item>
@@ -109,11 +132,12 @@
           </el-form-item>
           <el-form-item label="评分状态">
             <el-select v-model="recordFilters.ratingStatus" clearable placeholder="全部" @change="handleRatingStatusChange">
+              <el-option label="已评分" value="rated" />
               <el-option label="未评分" value="unrated" />
             </el-select>
           </el-form-item>
           <el-form-item class="record-actions">
-            <el-button type="primary" :loading="recordsLoading" @click="loadRecords">查询</el-button>
+            <el-button type="primary" :loading="recordsLoading" @click="searchRecords">查询</el-button>
             <el-button :disabled="recordsLoading" @click="resetRecordFilters">重置</el-button>
           </el-form-item>
         </el-form>
@@ -123,11 +147,13 @@
 
       <el-table v-else v-loading="recordsLoading" :data="recordList" class="data-table">
         <el-table-column prop="recordId" label="记录ID" width="90" />
-        <el-table-column prop="className" label="课程" />
-        <el-table-column prop="memberId" label="会员ID" width="120" />
-        <el-table-column prop="memberName" label="会员姓名" width="130" />
-        <el-table-column prop="joinTime" label="报名时间" width="170" />
-        <el-table-column label="状态" width="110">
+        <el-table-column prop="className" label="课程" min-width="140" />
+        <el-table-column prop="memberId" label="会员ID" min-width="130" />
+        <el-table-column prop="memberName" label="会员姓名" min-width="120" />
+        <el-table-column label="报名时间" min-width="160">
+          <template #default="scope">{{ formatDateTime(scope.row.joinTime) }}</template>
+        </el-table-column>
+        <el-table-column label="状态" min-width="100">
           <template #default="scope">
             <el-tag :type="statusType(scope.row.status)">{{ statusText(scope.row.status) }}</el-tag>
           </template>
@@ -141,6 +167,18 @@
       </el-table>
 
       <el-empty v-if="recordsTouched && !recordsLoading && !recordList.length" description="暂无报名记录" />
+
+      <div v-if="recordsTouched" class="table-footer">
+        <span class="table-count">共 {{ recordTotal }} 条报名记录</span>
+        <el-pagination
+          v-model:current-page="recordPage"
+          v-model:page-size="recordPageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="recordTotal"
+          background
+          layout="sizes, prev, pager, next"
+        />
+      </div>
     </section>
 
     <el-dialog v-model="detailVisible" :title="detail.cur?.className || '课程详情'" width="620px">
@@ -154,7 +192,7 @@
           <el-descriptions-item label="价格">¥{{ detail.cur.price }}</el-descriptions-item>
           <el-descriptions-item label="教练">{{ detail.cur.coach }}</el-descriptions-item>
           <el-descriptions-item label="容量">{{ detail.enrolled }} / {{ detail.cur.maxCapacity || '未设置' }}</el-descriptions-item>
-          <el-descriptions-item label="开课时间" :span="2">{{ detail.cur.classBegin }}</el-descriptions-item>
+          <el-descriptions-item label="开课时间" :span="2">{{ formatDateTime(detail.cur.classBegin) }}</el-descriptions-item>
           <el-descriptions-item label="课程描述" :span="2">{{ detail.cur.classDescription || '暂无描述' }}</el-descriptions-item>
           <el-descriptions-item label="使用器械" :span="2">
             <template v-if="detail.equipList?.length">
@@ -172,19 +210,23 @@
 
 <script setup>
 import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import api, { postForm } from '../api/client'
 
 const router = useRouter()
+const route = useRoute()
 const activeTab = ref('list')
 const classList = ref([])
 const classPage = ref(1)
 const classPageSize = ref(10)
-const classFilters = reactive({ keyword: '', capacityStatus: '' })
+const classFilters = reactive({ keyword: '', capacityStatus: '', level: '', duration: '' })
 const recordList = ref([])
 const recordsLoading = ref(false)
 const recordsTouched = ref(false)
+const recordPage = ref(1)
+const recordPageSize = ref(20)
+const recordTotal = ref(0)
 let pageActive = true
 let classRequestController = null
 let recordRequestController = null
@@ -192,6 +234,7 @@ let detailRequestController = null
 
 const recordFilters = reactive({
   classId: '',
+  className: '',
   memberKeyword: '',
   status: '',
   ratingStatus: '',
@@ -209,9 +252,16 @@ const filteredClassList = computed(() => {
       || String(item.className || '').toLowerCase().includes(keyword)
       || String(item.coach || '').toLowerCase().includes(keyword)
     const matchesStatus = !classFilters.capacityStatus || courseStatusKey(item) === classFilters.capacityStatus
-    return matchesKeyword && matchesStatus
+    const matchesLevel = !classFilters.level || String(item.classLevel || '') === classFilters.level
+    const duration = Number(item.classDuration || item.classTime || 0)
+    const matchesDuration = !classFilters.duration || duration === Number(classFilters.duration)
+    return matchesKeyword && matchesStatus && matchesLevel && matchesDuration
   })
 })
+
+const hasClassFilters = computed(() =>
+  Boolean(classFilters.keyword || classFilters.capacityStatus || classFilters.level || classFilters.duration)
+)
 
 const pagedClassList = computed(() => {
   const start = (classPage.value - 1) * classPageSize.value
@@ -247,6 +297,28 @@ function nullableNumber(value) {
   if (value === '' || value === null || value === undefined) return undefined
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function padTime(value) {
+  return String(value).padStart(2, '0')
+}
+
+function formatDateTime(value) {
+  if (!value) return '-'
+  if (typeof value === 'string') {
+    const normalized = value.trim().replace('T', ' ')
+    const matched = normalized.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/)
+    if (matched) return `${matched[1]} ${matched[2]}`
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return String(value)
+
+  return [
+    date.getFullYear(),
+    padTime(date.getMonth() + 1),
+    padTime(date.getDate())
+  ].join('-') + ` ${padTime(date.getHours())}:${padTime(date.getMinutes())}`
 }
 
 function numberValue(value) {
@@ -303,11 +375,17 @@ function courseStatusType(course) {
 function resetClassFilters() {
   classFilters.keyword = ''
   classFilters.capacityStatus = ''
+  classFilters.level = ''
+  classFilters.duration = ''
+  classPage.value = 1
+}
+
+function applyClassFilters() {
   classPage.value = 1
 }
 
 function handleRatingStatusChange() {
-  if (recordFilters.ratingStatus === 'unrated') {
+  if (recordFilters.ratingStatus === 'unrated' || recordFilters.ratingStatus === 'rated') {
     recordFilters.lowRating = ''
     recordFilters.highRating = ''
   }
@@ -333,7 +411,7 @@ async function loadClasses() {
   }
 }
 
-async function loadRecords() {
+async function loadRecords({ includeTotal = true } = {}) {
   recordRequestController?.abort()
   const controller = new AbortController()
   recordRequestController = controller
@@ -342,15 +420,20 @@ async function loadRecords() {
   try {
     const params = {
       classId: nullableNumber(recordFilters.classId),
+      className: recordFilters.className || undefined,
       memberKeyword: recordFilters.memberKeyword || undefined,
       status: nullableNumber(recordFilters.status),
       ratingStatus: recordFilters.ratingStatus || undefined,
-      lowRating: recordFilters.ratingStatus === 'unrated' ? undefined : nullableNumber(recordFilters.lowRating),
-      highRating: recordFilters.ratingStatus === 'unrated' ? undefined : nullableNumber(recordFilters.highRating)
+      lowRating: recordFilters.ratingStatus ? undefined : nullableNumber(recordFilters.lowRating),
+      highRating: recordFilters.ratingStatus ? undefined : nullableNumber(recordFilters.highRating),
+      page: recordPage.value,
+      pageSize: recordPageSize.value,
+      includeTotal
     }
     const resp = await api.get('/api/class/record/search', { params, signal: controller.signal })
     if (!pageActive || controller.signal.aborted) return
     recordList.value = resp.data?.classRecordList || []
+    if (includeTotal) recordTotal.value = Number(resp.data?.total || 0)
   } catch (error) {
     if (!isCanceled(error)) throw error
   } finally {
@@ -359,6 +442,14 @@ async function loadRecords() {
       if (pageActive) recordsLoading.value = false
     }
   }
+}
+
+function searchRecords() {
+  if (recordPage.value === 1) {
+    loadRecords().catch(() => {})
+    return
+  }
+  recordPage.value = 1
 }
 
 async function showDetail(classId) {
@@ -381,19 +472,38 @@ async function showDetail(classId) {
 
 function openRecords(classId) {
   recordFilters.classId = String(classId)
+  recordPage.value = 1
   activeTab.value = 'records'
+  loadRecords().catch(() => {})
+}
+
+function applyRecordQuery() {
+  if (route.query.tab === 'list') {
+    activeTab.value = 'list'
+    return
+  }
+  if (route.query.tab !== 'records') return
+  activeTab.value = 'records'
+  recordFilters.classId = route.query.classId ? String(route.query.classId) : ''
+  recordFilters.className = route.query.className ? String(route.query.className) : ''
+  recordFilters.memberKeyword = route.query.memberKeyword ? String(route.query.memberKeyword) : ''
+  recordFilters.status = route.query.status ? String(route.query.status) : ''
+  recordFilters.ratingStatus = ['rated', 'unrated'].includes(route.query.ratingStatus) ? route.query.ratingStatus : ''
+  recordPage.value = route.query.page ? Math.max(Number(route.query.page) || 1, 1) : 1
+  handleRatingStatusChange()
   loadRecords().catch(() => {})
 }
 
 function resetRecordFilters() {
   recordFilters.classId = ''
+  recordFilters.className = ''
   recordFilters.memberKeyword = ''
   recordFilters.status = ''
   recordFilters.ratingStatus = ''
   recordFilters.lowRating = ''
   recordFilters.highRating = ''
-  recordList.value = []
-  recordsTouched.value = false
+  recordPage.value = 1
+  loadRecords().catch(() => {})
 }
 
 async function delClass(classId) {
@@ -404,14 +514,44 @@ async function delClass(classId) {
 
 onMounted(() => {
   loadClasses().catch(() => {})
+  applyRecordQuery()
 })
 
 watch(
-  () => [classFilters.keyword, classFilters.capacityStatus, classPageSize.value],
+  () => [classFilters.keyword, classFilters.capacityStatus, classFilters.level, classFilters.duration, classPageSize.value],
   () => {
     classPage.value = 1
   }
 )
+
+watch(
+  () => route.fullPath,
+  () => {
+    if (route.path === '/class/selClass') applyRecordQuery()
+  }
+)
+
+watch(activeTab, (tab) => {
+  if (tab === 'records' && !recordsTouched.value) {
+    recordPage.value = 1
+    loadRecords().catch(() => {})
+  }
+})
+
+watch(recordPage, () => {
+  if (activeTab.value === 'records' && recordsTouched.value) {
+    loadRecords({ includeTotal: false }).catch(() => {})
+  }
+})
+
+watch(recordPageSize, () => {
+  if (activeTab.value !== 'records' || !recordsTouched.value) return
+  if (recordPage.value === 1) {
+    loadRecords().catch(() => {})
+    return
+  }
+  recordPage.value = 1
+})
 
 onActivated(() => {
   pageActive = true
@@ -482,7 +622,7 @@ p,
 
 .class-filter-form {
   display: grid;
-  grid-template-columns: minmax(240px, 360px) 180px auto;
+  grid-template-columns: minmax(220px, 1.4fr) 160px 130px 130px auto;
   gap: 12px;
   align-items: end;
 }
@@ -509,7 +649,7 @@ p,
 
 .record-form {
   display: grid;
-  grid-template-columns: 130px minmax(170px, 1.2fr) 140px 140px auto;
+  grid-template-columns: 120px minmax(150px, 1fr) minmax(150px, 1fr) 130px 130px auto;
   gap: 12px;
   align-items: end;
 }
@@ -556,6 +696,15 @@ p,
 
 .data-table {
   width: 100%;
+}
+
+.course-name-link {
+  color: #111827;
+  font-weight: 600;
+}
+
+.course-name-link:hover {
+  color: #0ea66f;
 }
 
 .course-capacity {

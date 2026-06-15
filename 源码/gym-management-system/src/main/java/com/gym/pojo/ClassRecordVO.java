@@ -11,7 +11,7 @@ public class ClassRecordVO {
     private Integer classId;
     private String className;
     private String coachName;
-    private Date classBegin;
+    private String classBegin;
     private Date joinTime;
     private Integer status;
     private Integer totalSessions;

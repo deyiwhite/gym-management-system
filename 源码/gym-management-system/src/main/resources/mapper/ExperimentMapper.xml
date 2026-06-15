@@ -9,7 +9,8 @@
         SELECT m.member_id, m.member_name
         FROM member m
         JOIN class_record cr ON m.member_id = cr.member_id
-        WHERE cr.class_id = 1
+        JOIN class_table ct ON cr.class_id = ct.class_id
+        WHERE ct.class_name = '瑜伽'
     </select>
 
     <!-- 查询(2): 报名增肌课的会员 -->
@@ -25,8 +26,12 @@
     <select id="query3_notYogaMembers" resultType="map">
         SELECT m.member_id, m.member_name
         FROM member m
-        WHERE m.member_id NOT IN (
-            SELECT cr.member_id FROM class_record cr WHERE cr.class_id = 1
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM class_record cr
+            JOIN class_table ct ON cr.class_id = ct.class_id
+            WHERE cr.member_id = m.member_id
+              AND ct.class_name = '瑜伽'
         )
     </select>
 
@@ -47,11 +52,17 @@
     <select id="query5_passExceptYoga" resultType="map">
         SELECT cr.member_id, ROUND(AVG(cr.rating), 1) AS avg_rating
         FROM class_record cr
+        JOIN class_table ct ON cr.class_id = ct.class_id
         WHERE cr.rating IS NOT NULL
-          AND cr.class_id &lt;&gt; 1
-          AND cr.member_id NOT IN (
-              SELECT cr2.member_id FROM class_record cr2
-              WHERE cr2.class_id &lt;&gt; 1 AND cr2.rating IS NOT NULL AND cr2.rating &lt; 5.0
+          AND ct.class_name &lt;&gt; '瑜伽'
+          AND NOT EXISTS (
+              SELECT 1
+              FROM class_record cr2
+              JOIN class_table ct2 ON cr2.class_id = ct2.class_id
+              WHERE cr2.member_id = cr.member_id
+                AND ct2.class_name &lt;&gt; '瑜伽'
+                AND cr2.rating IS NOT NULL
+                AND cr2.rating &lt; 5.0
           )
         GROUP BY cr.member_id
         ORDER BY avg_rating DESC

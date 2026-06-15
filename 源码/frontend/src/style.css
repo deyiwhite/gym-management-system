@@ -9,6 +9,13 @@
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
+  --el-color-primary: #10b981;
+  --el-color-primary-light-3: #34d399;
+  --el-color-primary-light-5: #6ee7b7;
+  --el-color-primary-light-7: #a7f3d0;
+  --el-color-primary-light-8: #d1fae5;
+  --el-color-primary-light-9: #ecfdf5;
+  --el-color-primary-dark-2: #059669;
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
@@ -348,15 +355,36 @@ code {
   box-shadow: 0 0 0 1px #b9c8dc inset;
 }
 
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused,
+.el-select .el-select__wrapper.is-focused,
+.el-input-number .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px #10b981 inset;
+}
+
 .el-button {
   border-radius: 8px;
   font-weight: 600;
 }
 
 .el-button--primary {
-  background: #2f7ef7;
-  border-color: #2f7ef7;
-  box-shadow: 0 8px 18px rgba(47, 126, 247, 0.18);
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.18);
+}
+
+.el-button--primary.is-plain {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669;
+  box-shadow: none;
+}
+
+.el-button--primary.is-plain:hover,
+.el-button--primary.is-plain:focus {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
 }
 
 .data-table.el-table {
@@ -387,7 +415,7 @@ code {
 }
 
 .el-pagination.is-background .el-pager li.is-active {
-  background-color: #2f7ef7;
+  background-color: #10b981;
 }
 
 .el-tag {

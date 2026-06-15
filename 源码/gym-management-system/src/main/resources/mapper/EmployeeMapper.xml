@@ -5,7 +5,7 @@
 <mapper namespace="com.gym.mapper.EmployeeMapper">
 
     <select id="findAll" resultType="employee">
-        SELECT employee_no        AS employee_account,
+        SELECT employee_id        AS employee_account,
                employee_name,
                gender             AS employee_gender,
                age                AS employee_age,
@@ -17,11 +17,11 @@
 
     <delete id="deleteByEmployeeAccount" parameterType="java.lang.String">
         DELETE FROM employee
-        WHERE employee_no = #{employeeAccount}
+        WHERE employee_id = #{employeeAccount}
     </delete>
 
     <insert id="insertEmployee" parameterType="employee">
-        INSERT INTO employee (employee_no, employee_name, gender, age, entry_date, position)
+        INSERT INTO employee (employee_id, employee_name, gender, age, entry_date, position)
         VALUES (#{employeeAccount}, #{employeeName}, #{employeeGender}, #{employeeAge}, #{entryTime}, #{staff})
     </insert>
 
@@ -31,11 +31,11 @@
             gender        = #{employeeGender},
             age           = #{employeeAge},
             position      = #{staff}
-        WHERE employee_no = #{employeeAccount}
+        WHERE employee_id = #{employeeAccount}
     </update>
 
     <select id="selectByEmployeeAccount" parameterType="java.lang.String" resultType="employee">
-        SELECT employee_no        AS employee_account,
+        SELECT employee_id        AS employee_account,
                employee_name,
                gender             AS employee_gender,
                age                AS employee_age,
@@ -43,7 +43,7 @@
                position           AS staff,
                ''                 AS employee_message
         FROM employee
-        WHERE employee_no = #{employeeAccount}
+        WHERE employee_id = #{employeeAccount}
     </select>
 
     <select id="selectTotalCount" resultType="java.lang.Integer">
@@ -51,7 +51,7 @@
     </select>
 
     <select id="searchEmployees" resultType="employee">
-        SELECT employee_no        AS employee_account,
+        SELECT employee_id        AS employee_account,
                employee_name,
                gender             AS employee_gender,
                age                AS employee_age,
@@ -62,7 +62,7 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (
-                    employee_no LIKE CONCAT('%', #{keyword}, '%')
+                    employee_id LIKE CONCAT('%', #{keyword}, '%')
                     OR employee_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
@@ -73,12 +73,12 @@
                 AND position LIKE CONCAT('%', #{staff}, '%')
             </if>
         </where>
-        ORDER BY employee_no ASC
+        ORDER BY employee_id ASC
         LIMIT #{offset}, #{pageSize}
     </select>
 
     <select id="selectMaxEmployeeNo" resultType="java.lang.String">
-        SELECT MAX(employee_no)
+        SELECT MAX(employee_id)
         FROM employee
     </select>
 
@@ -87,7 +87,7 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (
-                    employee_no LIKE CONCAT('%', #{keyword}, '%')
+                    employee_id LIKE CONCAT('%', #{keyword}, '%')
                     OR employee_name LIKE CONCAT('%', #{keyword}, '%')
                 )
             </if>
