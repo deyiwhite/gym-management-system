@@ -1,5 +1,32 @@
-# Vue 3 + TypeScript + Vite
+# 健身房管理系统前端
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+本目录为健身房管理系统的前端工程，基于 Vue 3、TypeScript、Vite、Vue Router、Element Plus 和 ECharts 实现。
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## 功能模块
+
+- 管理员登录与后台首页
+- 会员、员工、器材和课程管理
+- 课程报名记录查询与维护
+- 会员端个人信息、课程报名和已报名课程查看
+- 课程运营分析图表
+
+## 本地运行
+
+```bash
+npm install
+npm run dev
+```
+
+默认访问地址：
+
+```text
+http://localhost:5173
+```
+
+开发环境下，`/api` 请求会通过 Vite 代理转发到后端服务。
+
+## 构建
+
+```bash
+npm run build
+```
