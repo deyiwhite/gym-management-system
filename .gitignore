@@ -45,6 +45,13 @@ report_vector_figures/ppt_er/compact_check/
 report_vector_figures/ppt_er/fix_check/
 report_vector_figures/ppt_er/current_check/
 report_vector_figures/from_svg/
+report_vector_figures/**
+!report_vector_figures/
+!report_vector_figures/figure1-1-system-function-structure.png
+!report_vector_figures/figure2-1-technology-architecture.png
+!report_vector_figures/ppt_er/
+!report_vector_figures/ppt_er/manual_final/
+!report_vector_figures/ppt_er/manual_final/figure3-5-total-er.png
 tools/
 /figure*.svg
 
