@@ -1,0 +1,9 @@
+node_modules/
+dist/
+dist-ssr/
+frontend-dev.*.log
+frontend-dev.pid
+.vscode/
+.idea/
+*.local
+*.log

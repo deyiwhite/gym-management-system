@@ -1,13 +1,69 @@
-源码/frontend/node_modules/
-源码/frontend/dist/
-源码/frontend/frontend-dev.*.log
-源码/frontend/frontend-dev.pid
-源码/frontend/output/
+# Dependencies and build output
+source/frontend/node_modules/
+source/frontend/dist/
+source/frontend/dist-ssr/
+source/frontend/frontend-dev.*.log
+source/frontend/frontend-dev.pid
+source/frontend/output/
 
-源码/gym-management-system/target/
-源码/gym-management-system/.idea/
+source/gym-management-system/target/
+source/gym-management-system/.idea/
+source/gym-management-system/.mvn/wrapper/dists/
+source/gym-management-system/.mvn/wrapper/tmp/
 
-*.zip
+# Local browser/test/runtime output
+.tmp/
+.agents/
+.playwright-profile/
+.chrome-screenshot-profile*/
+output/
+plans/
+ui-previews/
+
+# Generated backup/recovery dumps
+backup-*.sql
+recovery-*.sql
+
+# Personal reports and process documents
+*.docx
+chapter*.md
+defense-review*.md
+review*.md
+ta-defense-review.md
+references.md
+Gym_DB_Design_Plan_V2.md
+6-*-*.md
+md文档/
+文档/
+课程实验报告模板*.docx
+数据库原理课程实验*.md
+report_vector_figures/**/*.pptx
+report_vector_figures/**/*.emf
+report_vector_figures/**/*.wmf
+report_vector_figures/ppt_er/style_check/
+report_vector_figures/ppt_er/compact_check/
+report_vector_figures/ppt_er/fix_check/
+report_vector_figures/ppt_er/current_check/
+report_vector_figures/from_svg/
+tools/
+/figure*.svg
+
+# Logs and local environment
 *.log
+*.pid
+*.local
+.env
+.env.*
+
+# Archives and OS/editor files
+*.zip
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
